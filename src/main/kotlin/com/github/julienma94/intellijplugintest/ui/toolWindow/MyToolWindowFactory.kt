@@ -1,15 +1,15 @@
-package com.github.julienma94.intellijplugintest.toolWindow
+package com.github.julienma94.intellijplugintest.ui.toolWindow
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.content.ContentFactory
-import com.github.julienma94.intellijplugintest.MyBundle
 import com.github.julienma94.intellijplugintest.services.MyProjectService
+import com.github.julienma94.intellijplugintest.ui.mainWindow.MainWindow
+import com.github.julienma94.intellijplugintest.ui.menu.SettingsMenu
 import javax.swing.JButton
 
 class MyToolWindowFactory : ToolWindowFactory {
@@ -28,19 +28,25 @@ class MyToolWindowFactory : ToolWindowFactory {
 
     class MyToolWindow(toolWindow: ToolWindow) {
 
-        private val service = toolWindow.project.service<MyProjectService>();
+        private val service = toolWindow.project.service<MyProjectService>()
+
 
         fun getContent() = JBPanel<JBPanel<*>>().apply {
-            val label = JBLabel(MyBundle.message("randomLabel", "?"))
-
-            add(label)
-
-            add(label)
-            add(JButton(MyBundle.message("shuffle")).apply {
+            val connectButton = JButton("Connect").apply {
                 addActionListener {
-                    label.text = MyBundle.message("randomLabel", service.getRandomNumber())
+                    ContentFactory.getInstance().createContent(MainWindow(), null, false)
                 }
-            })
+            }
+
+            val settingsButton = JButton("Settings").apply {
+                addActionListener {
+                    ContentFactory.getInstance().createContent(SettingsMenu(), null, false)
+                }
+            }
+
+            add(connectButton)
+            add(settingsButton)
+
         }
     }
 }
