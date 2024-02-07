@@ -11,7 +11,6 @@ class MainServiceImpl : MainService {
 
     override fun init() {
         thisLogger().info(MyBundle.message("start"))
-        SoyDi.addClassLoader(CorreoApp::class.java.classLoader)
         SoyDi.scan("org.correomqtt", false)
         SoyDi.scan("com.github.julienma94", false);
         app = SoyDi.inject(CorreoApp::class.java)
