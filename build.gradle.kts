@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
+
+    kotlin("kapt") version "1.9.22"
 }
 
 group = properties("pluginGroup").get()
@@ -24,8 +26,15 @@ repositories {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
+    annotationProcessor("org.correomqtt:di:0.15.0")
+
     implementation("org.correomqtt:di:0.15.0")
     implementation("org.correomqtt:core:0.15.0")
+}
+
+kapt {
+    showProcessorStats = true
+    keepJavacAnnotationProcessors = true
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

@@ -10,6 +10,12 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.julienma94.intellijplugintest.toolWindow.MyToolWindowFactory" icon="/icons/pluginIcon.svg" id="Correo"/>
+
+        <applicationService
+                serviceInterface="com.github.julienma94.intellijplugintest.services.MainService"
+                serviceImplementation="com.github.julienma94.intellijplugintest.services.MainServiceImpl"
+                id="Correo"
+        />
     </extensions>
 
     <applicationListeners>
