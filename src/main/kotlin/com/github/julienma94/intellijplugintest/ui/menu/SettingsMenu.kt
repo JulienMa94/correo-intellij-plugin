@@ -9,5 +9,6 @@ class SettingsMenu: JBPanel<JBPanel<*>>(){
 
     init {
         thisLogger().info("SettingsMenu created")
+        println("SettingsMenu created")
     }
 }

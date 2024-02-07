@@ -10,6 +10,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.julienma94.intellijplugintest.ui.toolWindow.MyToolWindowFactory" icon="/icons/pluginIcon.svg" id="Correo"/>
+        <fileEditorProvider implementation="com.github.julienma94.intellijplugintest.ui.mainWindow.MainEditorProvider" id="MyFileEditorProvider"/>
     </extensions>
 
     <applicationListeners>
