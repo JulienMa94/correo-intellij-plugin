@@ -25,12 +25,6 @@ class MyToolWindowFactory : ToolWindowFactory {
     override fun shouldBeAvailable(project: Project) = true
 
     class MyToolWindow(toolWindow: ToolWindow) {
-
-        private val service = service<MainService>()
-
-        fun getContent() = JBPanel<JBPanel<*>>().apply {
-            service.init()
-            service.createConnection()
-        }
+        fun getContent() = JBPanel<JBPanel<*>>().apply {}
     }
 }
