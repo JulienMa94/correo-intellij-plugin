@@ -1,23 +1,19 @@
-package com.github.julienma94.intellijplugintest.services
+package com.github.julienma94.intellijplugintest.core.services.activation
 
-import com.github.julienma94.intellijplugintest.CorreoApp
+import com.github.julienma94.intellijplugintest.CorreoPlugin
 import com.github.julienma94.intellijplugintest.MyBundle
 import com.intellij.openapi.diagnostic.thisLogger
 import org.correomqtt.di.SoyDi
 
-class MainServiceImpl : MainService {
+class ApplicationActivationServiceImpl : ApplicationActivationService {
 
-    private lateinit var app: CorreoApp
+    private lateinit var app: CorreoPlugin
 
     override fun init() {
         thisLogger().info(MyBundle.message("start"))
         SoyDi.scan("org.correomqtt", false)
         SoyDi.scan("com.github.julienma94", false);
-        app = SoyDi.inject(CorreoApp::class.java)
+        app = SoyDi.inject(CorreoPlugin::class.java)
         app.init()
-    }
-
-    override fun createConnection() {
-
     }
 }

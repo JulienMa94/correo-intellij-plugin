@@ -2,23 +2,29 @@
 <idea-plugin>
     <id>com.github.julienma94.intellijplugintest</id>
     <name>intellij-plugin-test Template</name>
-    <vendor>julienma94</vendor>
+    <vendor>Exxeta AG</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.julienma94.intellijplugintest.toolWindow.MyToolWindowFactory" icon="/icons/pluginIcon.svg" id="Correo"/>
+        <toolWindow factoryClass="com.github.julienma94.intellijplugintest.ui.connection.ConnectionManager" icon="/icons/pluginIcon.svg" id="Correo"/>
 
         <applicationService
-                serviceInterface="com.github.julienma94.intellijplugintest.services.MainService"
-                serviceImplementation="com.github.julienma94.intellijplugintest.services.MainServiceImpl"
-                id="Correo"
+                serviceInterface="com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationService"
+                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationServiceImpl"
+                id="ApplicationActivation"
+        />
+
+        <applicationService
+                serviceInterface="com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService"
+                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerServiceImpl"
+                id="ConnectionManager"
         />
     </extensions>
 
     <applicationListeners>
-        <listener class="com.github.julienma94.intellijplugintest.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
+        <listener class="com.github.julienma94.intellijplugintest.core.listeners.ApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 </idea-plugin>
