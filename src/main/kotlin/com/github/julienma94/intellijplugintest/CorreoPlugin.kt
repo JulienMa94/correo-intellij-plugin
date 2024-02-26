@@ -9,6 +9,8 @@ import org.correomqtt.di.SingletonBean
 class CorreoPlugin {
     private var correoCore: CorreoCore? = null
 
+    private var isInitialized = false;
+
     @Inject
     constructor(
             correoCore: CorreoCore,
@@ -17,17 +19,22 @@ class CorreoPlugin {
     }
 
     fun init() {
-        thisLogger().info("Correo App init")
-        correoCore!!.init()
+        if (!isInitialized) {
+            thisLogger().info("Correo App init")
+            correoCore!!.init()
+            isInitialized = true;
+        }
+    }
+}
 
-        // MVP roundtrip
+
+// MVP roundtrip
 //        connectionLifecycleTaskFactories!!.connectFactory
 //                .create("b9640522-db21-11e9-a31c-57c858de472e")
 //                .onSuccess {
 //                    subscribe()
 //                }
 //                .run()
-    }
 
 
 //    fun incomingMessageHook(@Observes event : IncomingMessageEvent ) {
@@ -62,4 +69,3 @@ class CorreoPlugin {
 //        publishTaskFactory!!.create("b9640522-db21-11e9-a31c-57c858de472e", messageDTO)
 //                .run()
 //    }
-}

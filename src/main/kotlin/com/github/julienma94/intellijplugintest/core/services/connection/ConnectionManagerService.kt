@@ -7,4 +7,5 @@ interface ConnectionManagerService {
     fun getConnections(): List<ConnectionConfigDTO>
 
     fun connect(connectionId: String)
+    fun disconnect(connectionId: String)
 }

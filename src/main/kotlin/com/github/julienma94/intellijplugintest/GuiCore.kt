@@ -1,6 +1,7 @@
 package com.github.julienma94.intellijplugintest
 
 import org.correomqtt.core.CoreManager
+import org.correomqtt.core.connection.ConnectionLifecycleTaskFactories
 import org.correomqtt.core.fileprovider.HistoryManager
 import org.correomqtt.core.settings.SettingsManager
 import org.correomqtt.core.utils.ConnectionManager
@@ -15,13 +16,15 @@ class GuiCore {
     private var connectionManager: ConnectionManager
     private var settingsManager: SettingsManager
     private var historyManager: HistoryManager
+    private var connectionLifecycleTaskFactories: ConnectionLifecycleTaskFactories
 
     @Inject
     constructor(
-            coreManager: CoreManager
+            coreManager: CoreManager,
+            connectionLifecycleTaskFactories: ConnectionLifecycleTaskFactories
     ) {
+        this.connectionLifecycleTaskFactories = connectionLifecycleTaskFactories
         this.coreManager = coreManager
-
         connectionManager = coreManager.connectionManager
         settingsManager = coreManager.settingsManager
         historyManager = coreManager.historyManager
@@ -37,5 +40,9 @@ class GuiCore {
 
     fun getHistoryManager(): HistoryManager {
         return this.historyManager;
+    }
+
+    fun getConnectionLifecycleTaskFactory(): ConnectionLifecycleTaskFactories {
+        return this.connectionLifecycleTaskFactories;
     }
 }

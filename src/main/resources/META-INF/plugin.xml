@@ -9,7 +9,9 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.julienma94.intellijplugintest.ui.connection.ConnectionManager" icon="/icons/pluginIcon.svg" id="Correo"/>
+        <toolWindow factoryClass="com.github.julienma94.intellijplugintest.ui.connection.ConnectionManager" icon="/icons/pluginIcon.svg" id="Correo" />
+
+        <fileEditorProvider implementation="com.github.julienma94.intellijplugintest.ui.editor.PublishSubscribeProvider"/>
 
         <applicationService
                 serviceInterface="com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationService"
