@@ -8,4 +8,6 @@ interface ConnectionManagerService {
 
     fun connect(connectionId: String)
     fun disconnect(connectionId: String)
+    fun subscribe(topic: String)
+    fun publish(topic: String, payload: String)
 }
