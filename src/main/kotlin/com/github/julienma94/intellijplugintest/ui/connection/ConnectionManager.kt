@@ -21,9 +21,6 @@ class ConnectionManager : ToolWindowFactory {
 
         val myToolWindow = MyToolWindow(toolWindow)
         myToolWindow.setService(service)
-        //val mainTab = JBTabbedPane()
-//
-        //val toolWindowMain = ToolWindowManager.getInstance(project).getToolWindow(toolWindow.id)
 
         val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(project), null, false)
         toolWindow.contentManager.addContent(content)
@@ -47,22 +44,12 @@ class ConnectionManager : ToolWindowFactory {
             val connections = service.getConnections()
 
             val panel = panel {
-                group {
+                group ("Connections") {
                     connections.forEach {
                         row {
                             text(it.name).bold()
                         }
                         row(it.hostAndPort) {
-                            //val connectionAction = object : DumbAwareAction("Connect to ${it.name}", "Connect to ${it.name}", AllIcons.Actions.Execute) {
-                            //    override fun actionPerformed(e: AnActionEvent) {
-                            //        service.connect(it.id)
-                            //    }
-                            //}
-                            //val disconnectAction = object : DumbAwareAction("Disconnect to ${it.name}", "Disconnect to ${it.name}", AllIcons.Actions.Cancel) {
-                            //    override fun actionPerformed(e: AnActionEvent) {
-                            //        service.disconnect(it.id)
-                            //    }
-                            //}
                             actionButton(CreateTabAction(it, project))
                             actionButton(DeleteTabAction(it, project))
                         }
