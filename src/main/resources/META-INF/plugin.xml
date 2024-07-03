@@ -9,7 +9,7 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.julienma94.intellijplugintest.ui.connection.ConnectionManager" icon="/icons/pluginIcon.svg" id="Correo" />
+        <toolWindow  id="Correo" anchor="bottom" icon="/icons/pluginIcon.svg" factoryClass="com.github.julienma94.intellijplugintest.ui.connection.ConnectionManager"  />
 
         <applicationService
                 serviceInterface="com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationService"

@@ -1,64 +1,120 @@
 package com.github.julienma94.intellijplugintest.ui.connection
 
 import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
-import com.github.julienma94.intellijplugintest.ui.tab.CreateTabAction
-import com.github.julienma94.intellijplugintest.ui.tab.DeleteTabAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.ui.JBSplitter
 import com.intellij.ui.content.ContentFactory
-import com.intellij.ui.dsl.builder.panel
-
+import java.awt.BorderLayout
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import javax.swing.*
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.DefaultTreeModel
 
 
 class ConnectionManager : ToolWindowFactory {
 
-    private val service = service<ConnectionManagerService>()
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-
         val myToolWindow = MyToolWindow(toolWindow)
-        myToolWindow.setService(service)
 
         val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(project), null, false)
         toolWindow.contentManager.addContent(content)
     }
 
-
     override fun shouldBeAvailable(project: Project) = true
 
-    class MyToolWindow(toolWindow: ToolWindow) {
+    class MyToolWindow() {
 
-        private lateinit var service: ConnectionManagerService;
+        private val service = service<ConnectionManagerService>()
+        private val content: JPanel = JPanel(BorderLayout())
+        private val tree: JTree = JTree()
+        private val splitter: JBSplitter = JBSplitter(false, 0.3f)
+        private val tabbedPane: JTabbedPane = JTabbedPane()
 
+        init {
+            initializeConnectionTree()
 
-        fun setService(service: ConnectionManagerService) {
-            this.service = service
+            // TabbedPane setup
+            splitter.secondComponent = tabbedPane
+            content.add(splitter, BorderLayout.CENTER)
         }
 
+        private fun initializeConnectionTree() {
+            val connections = service.getConnections();
 
+            // Tree setup
+            val root = DefaultMutableTreeNode("MQTT")
+            connections.forEach {
+                val connection = DefaultMutableTreeNode(it.name)
+                root.add(connection)
+            }
 
-        fun getContent(project: Project): DialogPanel {
-            val connections = service.getConnections()
+            tree.model = DefaultTreeModel(root)
+            splitter.firstComponent = JScrollPane(tree)
 
-            val panel = panel {
-                group ("Connections") {
-                    connections.forEach {
-                        row {
-                            text(it.name).bold()
+            // Add mouse listener to handle double-clicks
+            tree.addMouseListener(object : MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent) {
+                    if (e.clickCount == 2) {
+                        val selectedNode = tree.lastSelectedPathComponent as? DefaultMutableTreeNode
+                        if (selectedNode != null && selectedNode.isLeaf) {
+                            val tabTitle = selectedNode.userObject.toString()
+                            addTab(tabTitle)
                         }
-                        row(it.hostAndPort) {
-                            actionButton(CreateTabAction(it, project))
-                            actionButton(DeleteTabAction(it, project))
-                        }
-                        separator()
                     }
+                }
+            })
+        }
+
+        private fun addTab(title: String) {
+            // Check if tab with the same title already exists
+            for (i in 0 until tabbedPane.tabCount) {
+                if (tabbedPane.getTitleAt(i) == title) {
+                    tabbedPane.selectedIndex = i
+                    return
                 }
             }
 
-            return panel
+            // Create tab content
+            val tabContent = JPanel(BorderLayout())
+            tabContent.add(JLabel("Content for $title"), BorderLayout.CENTER)
+
+            // Add tab with custom tab component
+            tabbedPane.addTab(title, tabContent)
+            val tabIndex = tabbedPane.indexOfComponent(tabContent)
+            tabbedPane.setTabComponentAt(tabIndex, createTabComponent(title))
+
+            // Select the new tab
+            tabbedPane.selectedIndex = tabIndex
+        }
+
+        private fun createTabComponent(title: String): JPanel {
+            val tabComponent = JPanel(BorderLayout())
+            tabComponent.isOpaque = false
+
+            val titleLabel = JLabel(title)
+            val closeButton = JButton("x")
+
+            closeButton.border = BorderFactory.createEmptyBorder()
+            closeButton.isContentAreaFilled = false
+            closeButton.addActionListener {
+                val tabIndex = tabbedPane.indexOfTabComponent(tabComponent)
+                if (tabIndex != -1) {
+                    tabbedPane.remove(tabIndex)
+                }
+            }
+
+            tabComponent.add(titleLabel, BorderLayout.CENTER)
+            tabComponent.add(closeButton, BorderLayout.EAST)
+            return tabComponent
+        }
+
+        fun getContent(): JPanel {
+            return content
         }
     }
 }
