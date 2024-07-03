@@ -1,32 +1,16 @@
 package com.github.julienma94.intellijplugintest.ui.connection
 
-import com.github.julienma94.intellijplugintest.GuiCore
-import com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationService
 import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
-import com.github.julienma94.intellijplugintest.ui.editor.PublishSubscribeProvider
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import com.intellij.ui.components.JBPanel
-import com.intellij.ui.components.JBList
 import com.intellij.ui.content.ContentFactory
-import com.intellij.ui.dsl.builder.Row
-import org.correomqtt.core.model.ConnectionConfigDTO
-import org.correomqtt.core.settings.SettingsManager
-import org.correomqtt.core.utils.ConnectionManager
-import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.Gaps
-import org.correomqtt.core.connection.ConnectionLifecycleTaskFactories
-import org.correomqtt.di.Inject
-import javax.swing.JLabel
-import javax.swing.JTextField
 
 
 class ConnectionManager : ToolWindowFactory {
@@ -54,7 +38,6 @@ class ConnectionManager : ToolWindowFactory {
 
         fun getContent(): DialogPanel {
             val connections = service.getConnections()
-            val editor = PublishSubscribeProvider()
 
             val panel = panel {
                 group {
