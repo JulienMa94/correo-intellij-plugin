@@ -18,6 +18,7 @@ class ApplicationActivationServiceImpl : ApplicationActivationService {
            SoyDi.scan("com.github.julienma94");
            app = SoyDi.inject(CorreoPlugin::class.java)
            app.init()
+           isInitialized = true
        }
     }
 }

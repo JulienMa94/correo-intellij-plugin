@@ -35,6 +35,9 @@ dependencies {
 
     implementation("org.correomqtt:di:0.15.0")
     implementation("org.correomqtt:core:0.15.0")
+    implementation("com.fifesoft:rsyntaxtextarea:3.4.1")
+    implementation("com.fifesoft:autocomplete:3.3.1")
+    implementation("org.json:json:20210307")  // For JSON validation
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
