@@ -20,9 +20,7 @@ class CorreoPlugin {
         this.correoCore = correoCore
     }
 
-    fun incomingMessageEvent(@Observes event: IncomingMessageEvent) {
-        println("Got message ${event.messageDTO.payload}")
-    }
+
 
     fun init() {
         if (!isInitialized) {
