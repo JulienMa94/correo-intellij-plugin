@@ -25,70 +25,68 @@ class PublishView {
 
     public fun getPublishContent(): DialogPanel {
         return panel {
-            group("Publish", true) {
-                fun getEditorFont(colorsScheme: EditorColorsScheme): Font {
-                    // Retrieve the editor font from the current scheme
-                    val editorFont = colorsScheme.getFont(EditorFontType.PLAIN)
-                    return Font(editorFont.family, Font.PLAIN, editorFont.size)
+            fun getEditorFont(colorsScheme: EditorColorsScheme): Font {
+                // Retrieve the editor font from the current scheme
+                val editorFont = colorsScheme.getFont(EditorFontType.PLAIN)
+                return Font(editorFont.family, Font.PLAIN, editorFont.size)
+            }
+
+            fun applyIntelliJTheme(textArea: RSyntaxTextArea) {
+                // Get the current editor colors scheme
+                val colorsScheme = EditorColorsManager.getInstance().globalScheme
+
+                // Apply colors and fonts from IntelliJ theme to RSyntaxTextArea
+                textArea.background = colorsScheme.defaultBackground
+                textArea.foreground = colorsScheme.defaultForeground
+                textArea.font = getEditorFont(colorsScheme)
+
+                // Apply caret color
+                textArea.caretColor = colorsScheme.getColor(EditorColors.CARET_COLOR)
+
+                // Apply selection color
+                textArea.selectionColor = colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
+                textArea.selectedTextColor = colorsScheme.getColor(EditorColors.SELECTION_FOREGROUND_COLOR)
+                textArea.currentLineHighlightColor = colorsScheme.getColor(EditorColors.CARET_ROW_COLOR)
+            }
+
+
+            fun createCompletionProvider(): CompletionProvider {
+                val provider = DefaultCompletionProvider()
+                return provider
+            }
+
+            fun createJsonTextArea(): RSyntaxTextArea {
+                val textArea = RSyntaxTextArea(20, 60)
+                textArea.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_JSON
+                textArea.isCodeFoldingEnabled = true
+
+                val provider = createCompletionProvider()
+                val ac = AutoCompletion(provider)
+                ac.install(textArea)
+
+                applyIntelliJTheme(textArea)
+                return textArea
+            }
+
+            val topicTextField = JTextField()
+            val textArea = createJsonTextArea()
+
+
+            val subscribeAction = object : DumbAwareAction(
+                "Publishing to ${topicTextField.text}",
+                "Subscribing action",
+                AllIcons.Actions.Execute
+            ) {
+                override fun actionPerformed(e: AnActionEvent) {
+                    service.publish(topicTextField.text, textArea.text)
                 }
-
-                fun applyIntelliJTheme(textArea: RSyntaxTextArea) {
-                    // Get the current editor colors scheme
-                    val colorsScheme = EditorColorsManager.getInstance().globalScheme
-
-                    // Apply colors and fonts from IntelliJ theme to RSyntaxTextArea
-                    textArea.background = colorsScheme.defaultBackground
-                    textArea.foreground = colorsScheme.defaultForeground
-                    textArea.font = getEditorFont(colorsScheme)
-
-                    // Apply caret color
-                    textArea.caretColor = colorsScheme.getColor(EditorColors.CARET_COLOR)
-
-                    // Apply selection color
-                    textArea.selectionColor = colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
-                    textArea.selectedTextColor = colorsScheme.getColor(EditorColors.SELECTION_FOREGROUND_COLOR)
-                    textArea.currentLineHighlightColor = colorsScheme.getColor(EditorColors.CARET_ROW_COLOR)
-                }
-
-
-                fun createCompletionProvider(): CompletionProvider {
-                    val provider = DefaultCompletionProvider()
-                    return provider
-                }
-
-                fun createJsonTextArea(): RSyntaxTextArea {
-                    val textArea = RSyntaxTextArea(20, 60)
-                    textArea.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_JSON
-                    textArea.isCodeFoldingEnabled = true
-
-                    val provider = createCompletionProvider()
-                    val ac = AutoCompletion(provider)
-                    ac.install(textArea)
-
-                    applyIntelliJTheme(textArea)
-                    return textArea
-                }
-
-                val topicTextField = JTextField()
-                val textArea = createJsonTextArea()
-
-
-                val subscribeAction = object : DumbAwareAction(
-                    "Publishing to ${topicTextField.text}",
-                    "Subscribing action",
-                    AllIcons.Actions.Execute
-                ) {
-                    override fun actionPerformed(e: AnActionEvent) {
-                        service.publish(topicTextField.text, textArea.text)
-                    }
-                }
-                row {
-                    cell(topicTextField).resizableColumn().align(AlignX.FILL)
-                    actionButton(subscribeAction)
-                }
-                row {
-                    cell(textArea).resizableColumn().align(AlignX.FILL)
-                }
+            }
+            row {
+                cell(topicTextField).resizableColumn().align(AlignX.FILL)
+                actionButton(subscribeAction)
+            }
+            row {
+                cell(textArea).resizableColumn().align(AlignX.FILL)
             }
         }
     }
