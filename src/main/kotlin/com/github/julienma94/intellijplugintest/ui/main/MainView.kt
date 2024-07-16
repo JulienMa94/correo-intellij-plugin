@@ -6,6 +6,7 @@ import com.github.julienma94.intellijplugintest.ui.connection.ConnectionManager
 import com.github.julienma94.intellijplugintest.ui.publish.PublishView
 import com.github.julienma94.intellijplugintest.ui.subscribe.SubscribeView
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.JBSplitter
@@ -13,6 +14,7 @@ import com.intellij.ui.content.ContentFactory
 import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
 import javax.swing.*
+import javax.swing.border.LineBorder
 
 class MainView : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: com.intellij.openapi.wm.ToolWindow) {
@@ -39,6 +41,11 @@ class MainView : ToolWindowFactory {
             val tree = connectionManager.initializeConnectionTree(::addConnectionTab)
             splitter.firstComponent = JScrollPane(tree)
             splitter.secondComponent = JScrollPane(tabbedPane)
+            val colorsScheme = EditorColorsManager.getInstance().globalScheme
+            val customBorder = BorderFactory.createMatteBorder(0, 0, 0, 1, colorsScheme.defaultBackground)
+            splitter.firstComponent.border = customBorder
+            splitter.secondComponent.border = null
+
             content.add(splitter, BorderLayout.CENTER)
         }
 

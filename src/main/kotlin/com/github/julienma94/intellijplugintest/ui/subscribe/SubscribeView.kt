@@ -4,6 +4,7 @@ import com.github.julienma94.intellijplugintest.core.services.connection.Connect
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.AlignX
@@ -34,7 +35,7 @@ class SubscribeView {
     fun incomingMessageEvent(@Observes event: IncomingMessageEvent) {
         println("Received incoming message event for topic ${event.messageDTO.topic}")
         addMessageToMap(event);
-        addRow(event.messageDTO.payload)
+        addRow(event)
     }
 
     private fun addMessageToMap(message: IncomingMessageEvent) {
@@ -53,12 +54,13 @@ class SubscribeView {
 
     fun getSubscribeContent(): JPanel {
         content.layout = BorderLayout()
+        val colorsScheme = EditorColorsManager.getInstance().globalScheme
 
         val rowScrollPane = JScrollPane(rowContainer)
         rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         rowScrollPane.preferredSize = Dimension(content.width, content.height)
-
+        rowScrollPane.border = null
 
         content.add(getSubscribeSection(), BorderLayout.NORTH)
         content.add(rowScrollPane, BorderLayout.CENTER)
@@ -86,17 +88,28 @@ class SubscribeView {
         }
     }
 
-    private fun addRow(message: String) {
+    private fun addRow(message: IncomingMessageEvent) {
         SwingUtilities.invokeLater {
+            val colorsScheme = EditorColorsManager.getInstance().globalScheme
+
             val row = JPanel(BorderLayout())
-            row.add(JLabel(message), BorderLayout.WEST)
+            row.border = null;
+
+            val label = JLabel(message.messageDTO.topic)
+            label.border = BorderFactory.createEmptyBorder(5, 0, 5, 0) // Adjust padding as needed
+            row.add(label, BorderLayout.WEST)
+
+            // Add a line border at the bottom of the row, except for the last row
+            if (rowContainer.components.isNotEmpty()) {
+                val lastRow = rowContainer.components.last() as JPanel
+                lastRow.border = BorderFactory.createMatteBorder(0, 0, 1, 0, colorsScheme.defaultBackground)
+            }
             row.preferredSize = Dimension(rowContainer.width, 50)
-            row.border = LineBorder(Color.BLACK)
+            row.border = LineBorder(colorsScheme.defaultBackground)
             row.maximumSize = Dimension(Int.MAX_VALUE, 50)
             row.minimumSize = Dimension(rowContainer.width, 50)
 
             rowContainer.add(row)
-            rowContainer.add(Box.createVerticalStrut(5))
 
             rowContainer.revalidate()
             rowContainer.repaint()
@@ -104,6 +117,20 @@ class SubscribeView {
             // Ensure the new row is visible
             val scrollPane = rowContainer.parent.parent as JScrollPane
             scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+        }
+    }
+
+    private fun getRowContent(message: IncomingMessageEvent): DialogPanel {
+        return panel() {
+            row {
+                panel {
+                    row {
+                        label(message.messageDTO.topic)
+                        text(message.messageDTO.qos.toString(), 50)
+                    }
+                }
+                text(message.messageDTO.payload, 50)
+            }
         }
     }
 }
