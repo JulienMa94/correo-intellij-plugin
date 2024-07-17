@@ -15,11 +15,9 @@ class ConnectionManagerServiceImpl : ConnectionManagerService {
 
     private val settingsManager: SettingsManager = guiCore.getSettingsManager()
 
-    private val subscribeTaskFactory: SubscribeTaskFactory = guiCore.getSubscriptionManager()
+    private val tabIndexToConnectionId = mutableMapOf<Int, String>()
 
-    private val publishTaskFactory: PublishTaskFactory = guiCore.getPublishTaskManager()
-
-    private lateinit var connectedId: String;
+    private lateinit var activeConnectionId: String;
 
     override fun getConnections(): List<ConnectionConfigDTO> {
         return settingsManager.connectionConfigs
@@ -30,7 +28,6 @@ class ConnectionManagerServiceImpl : ConnectionManagerService {
                 .connectFactory
                 .create(connectionId)
                 .onSuccess {
-                    connectedId = connectionId
                     println("Successfully connected to $connectionId");
                 }
                 .onError {
@@ -39,7 +36,9 @@ class ConnectionManagerServiceImpl : ConnectionManagerService {
                 .run()
     }
 
-    override fun disconnect(connectionId: String) {
+    override fun disconnect(tabIndex: Int) {
+        val connectionId = tabIndexToConnectionId[tabIndex] ?: return
+
         guiCore.getConnectionLifecycleTaskFactory()
                 .disconnectFactory
                 .create(connectionId)
@@ -51,31 +50,21 @@ class ConnectionManagerServiceImpl : ConnectionManagerService {
                 }
                 .run()
     }
-    override fun subscribe(topic: String) {
-        val subscribeDTO = SubscriptionDTO.builder()
-            .topic(topic)
-            .qos(Qos.AT_LEAST_ONCE)
-            .build()
 
-        println("Try subscribing to $topic with connectionId $connectedId")
-
-        subscribeTaskFactory.create(connectedId, subscribeDTO).onSuccess {
-            println("Succesfully subscribed to $topic")
-        }.run()
+    override fun addConnectionId(tabIndex: Int, connectionId: String) {
+        tabIndexToConnectionId[tabIndex] = connectionId
     }
 
-    override fun publish(topic: String, payload: String) {
-
-        val messageDTO = MessageDTO.builder()
-            .topic(topic)
-            .payload(payload)
-            .qos(Qos.AT_LEAST_ONCE)
-            .messageId(UUID.randomUUID().toString())
-            .messageType(MessageType.OUTGOING)
-            .dateTime(LocalDateTime.now())
-            .build()
-        publishTaskFactory.create(connectedId, messageDTO).onSuccess {
-            println("Publishing message on topic $topic")
-        }.run()
+    override fun removeConnectionId(tabIndex: Int) {
+        tabIndexToConnectionId.remove(tabIndex)
     }
+
+    override fun setActiveConnectionId(connectionId: String) {
+        activeConnectionId = connectionId
+    }
+
+    override fun getActiveConnectionId(): String {
+       return activeConnectionId
+    }
+
 }

@@ -7,14 +7,13 @@ import java.awt.event.MouseEvent
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
-import kotlin.reflect.KFunction1
 
-class ConnectionManager {
+class ConnectionTree() {
 
     private val service = service<ConnectionManagerService>()
     private val tree: JTree = JTree()
 
-    public fun initializeConnectionTree(onDoubleClick: KFunction1<String, Unit>): JTree {
+    fun initializeConnectionTree(onDoubleClick: (String, String) -> Unit): JTree {
         val connections = service.getConnections();
 
         // Tree setup
@@ -40,7 +39,7 @@ class ConnectionManager {
                         if (connection != null) {
                             service.connect(connection.id)
                             val tabTitle = selectedNode.userObject.toString()
-                            onDoubleClick(tabTitle)
+                            onDoubleClick(tabTitle, connection.id)
                         }
                     }
                 }
@@ -50,3 +49,5 @@ class ConnectionManager {
         return tree;
     }
 }
+
+

@@ -9,12 +9,31 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow  id="Correo" anchor="bottom" icon="/icons/pluginIcon.svg" factoryClass="com.github.julienma94.intellijplugintest.ui.main.MainView"  />
+        <toolWindow id="Correo" anchor="bottom" icon="/icons/pluginIcon.svg"
+                    factoryClass="com.github.julienma94.intellijplugintest.ui.main.MainView"/>
 
         <applicationService
                 serviceInterface="com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationService"
                 serviceImplementation="com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationServiceImpl"
                 id="ApplicationActivation"
+        />
+
+        <applicationService
+                serviceInterface="com.github.julienma94.intellijplugintest.core.services.tabmanagement.TabService"
+                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.tabmanagement.TabServiceImpl"
+                id="TabManagement"
+        />
+
+        <applicationService
+                serviceInterface="com.github.julienma94.intellijplugintest.core.services.publish.PublishService"
+                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.publish.PublishServiceImpl"
+                id="PublishService"
+        />
+
+        <applicationService
+                serviceInterface="com.github.julienma94.intellijplugintest.core.services.subscribe.SubscribeService"
+                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.subscribe.SubscribeServiceImpl"
+                id="SubscribeService"
         />
 
         <applicationService
@@ -25,6 +44,7 @@
     </extensions>
 
     <applicationListeners>
-        <listener class="com.github.julienma94.intellijplugintest.core.listeners.ApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
+        <listener class="com.github.julienma94.intellijplugintest.core.listeners.ApplicationActivationListener"
+                  topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 </idea-plugin>

@@ -1,55 +1,94 @@
 package com.github.julienma94.intellijplugintest.ui.tab
 
 import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
-import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
+import com.github.julienma94.intellijplugintest.ui.publish.PublishView
+import com.github.julienma94.intellijplugintest.ui.subscribe.SubscribeView
 import com.intellij.openapi.components.service
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.ui.content.ContentFactory
-import org.correomqtt.core.model.ConnectionConfigDTO
+import org.correomqtt.di.SoyDi
+import java.awt.BorderLayout
+import javax.swing.BorderFactory
+import javax.swing.JButton
 import javax.swing.JLabel
+import javax.swing.JPanel
 
-class CreateTabAction(private val service: ConnectionConfigDTO, private val project: Project) : AnAction("Create JPTabbedPane", "Create JPTabbedPane", AllIcons.Actions.Execute) {
-    private val services = service<ConnectionManagerService>()
+class TabManager() {
+    private var subscribeView: SubscribeView
+    private val publishView: PublishView = PublishView()
+    private val tabbedPane = JBTabbedPane()
+    private val connectionService = service<ConnectionManagerService>()
 
-    override fun actionPerformed(e: AnActionEvent) {
-        services.connect(service.id)
-        val toolWindowManager = ToolWindowManager.getInstance(project)
+    init {
+       SoyDi.inject(SubscribeView::class.java).let {
+                subscribeView = it
+       }
+    }
 
-        val toolWindow = toolWindowManager.getToolWindow("Correo")
+    fun getTabbedPane(): JBTabbedPane {
+        return tabbedPane
+    }
 
-        val tabs = toolWindow?.contentManager?.contents
-        var tabExist = false
-        if (tabs != null) {
-            for (tab in tabs) {
-                println(tab.tabName)
-                if (tab?.tabName.equals(service.id)) {
-                    println("Tab already exists")
-                    tabExist = true
-                }
+    fun createTab(connectionId: String, title: String) {
+        // Check if tab with the same title already exists
+        for (i in 0 until tabbedPane.tabCount) {
+            if (tabbedPane.getTitleAt(i) == title) {
+                tabbedPane.selectedIndex = i
+                return
             }
         }
-        if (!tabExist) {
-            val tabbedPane = JBTabbedPane()
 
-            // Add content to the tab
-            println("Creating JPTabbedPane")
-            val tabName = "Tab " + (tabbedPane.tabCount + 1)
-            tabbedPane.addTab(tabName, JLabel("Hello World, $tabName"))
+        // Create tab content
+        val tabContent = JPanel(BorderLayout())
+        tabContent.add(getTabContent())
 
-            val contentFactory = ContentFactory.getInstance()
-            val content = contentFactory.createContent(tabbedPane, service.id, false)
+        // Add tab with custom tab component
+        tabbedPane.addTab(title, tabContent)
+        val tabIndex = tabbedPane.indexOfComponent(tabContent)
+        tabbedPane.setTabComponentAt(tabIndex, createTabComponent(title))
+        connectionService.addConnectionId(tabIndex, connectionId)
 
-            toolWindow?.contentManager?.addContent(content)
-            toolWindow?.contentManager?.setSelectedContent(content)
+        // Select the new tab
+        tabbedPane.selectedIndex = tabIndex
+        connectionService.setActiveConnectionId(connectionId)
+    }
+
+
+    private fun createTabComponent(title: String): JPanel {
+        val tabComponent = JPanel(BorderLayout())
+        tabComponent.isOpaque = false
+
+        val titleLabel = JLabel(title)
+        val closeButton = JButton("x")
+
+        closeButton.border = BorderFactory.createEmptyBorder()
+        closeButton.isContentAreaFilled = false
+        closeButton.addActionListener {
+            val tabIndex = tabbedPane.indexOfTabComponent(tabComponent)
+            if (tabIndex != -1) {
+                tabbedPane.remove(tabIndex)
+                connectionService.disconnect(tabIndex)
+            }
         }
+
+        tabComponent.add(titleLabel, BorderLayout.CENTER)
+        tabComponent.add(closeButton, BorderLayout.EAST)
+        return tabComponent
+    }
+
+
+    private fun getTabContent(): JBSplitter {
+        val splitter: JBSplitter = JBSplitter(false, 0.5f)
+
+        splitter.firstComponent = subscribeView.getSubscribeContent()
+        splitter.secondComponent = publishView.getPublishContent()
+
+        return splitter
     }
 }
 
-class DeleteTabAction(private val service: ConnectionConfigDTO, private val project: Project) : AnAction("Delete Tab", "Delete the currently selected tab", AllIcons.Actions.Cancel) {
+/*class DeleteTabAction(private val service: ConnectionConfigDTO, private val project: Project) :
+    AnAction("Delete Tab", "Delete the currently selected tab", AllIcons.Actions.Cancel) {
     private val services = service<ConnectionManagerService>()
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -72,4 +111,32 @@ class DeleteTabAction(private val service: ConnectionConfigDTO, private val proj
 
     }
 
+}*/
+
+/*
+private fun addConnectionTab(title: String, connection: ConnectionConfigDTO) {
+    // Check if tab with the same title already exists
+    for (i in 0 until tabbedPane.tabCount) {
+        if (tabbedPane.getTitleAt(i) == title) {
+            tabbedPane.selectedIndex = i
+            return
+        }
+    }
+
+    // Create tab content
+    val tabContent = JPanel(BorderLayout())
+    tabContent.add(getTabContent())
+
+    // Add tab with custom tab component
+    tabbedPane.addTab(title, tabContent)
+    val tabIndex = tabbedPane.indexOfComponent(tabContent)
+    tabbedPane.setTabComponentAt(tabIndex, createTabComponent(title))
+
+    // Select the new tab
+    tabbedPane.selectedIndex = tabIndex
 }
+
+
+
+
+*/

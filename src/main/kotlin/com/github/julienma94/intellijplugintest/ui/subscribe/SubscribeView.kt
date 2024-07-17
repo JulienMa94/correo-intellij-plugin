@@ -1,28 +1,31 @@
 package com.github.julienma94.intellijplugintest.ui.subscribe;
 
-import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
+import com.github.julienma94.intellijplugintest.core.services.subscribe.SubscribeService
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.panel
+import org.correomqtt.core.model.Qos
 import org.correomqtt.core.pubsub.IncomingMessageEvent
 import org.correomqtt.core.pubsub.SubscribeEvent
 import org.correomqtt.core.pubsub.UnsubscribeEvent
 import org.correomqtt.di.Observes
 import org.correomqtt.di.SingletonBean
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Dimension
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
 import javax.swing.*
 import javax.swing.border.LineBorder
 
 @SingletonBean
 class SubscribeView {
-    private val service = service<ConnectionManagerService>()
+    private val subscribeService = service<SubscribeService>()
     private val content: JPanel = JPanel(BorderLayout())
     private var rowContainer: JPanel = JPanel()
 
@@ -54,7 +57,6 @@ class SubscribeView {
 
     fun getSubscribeContent(): JPanel {
         content.layout = BorderLayout()
-        val colorsScheme = EditorColorsManager.getInstance().globalScheme
 
         val rowScrollPane = JScrollPane(rowContainer)
         rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
@@ -69,21 +71,47 @@ class SubscribeView {
 
     private fun getSubscribeSection(): DialogPanel {
         return panel {
-            row {
-                val textField = JTextField()
+            val textField = JTextField()
 
-                val subscribeAction = object : DumbAwareAction(
-                    "Subscribing to ${textField.text}",
-                    "Subscribing action",
-                    AllIcons.Actions.Execute
-                ) {
-                    override fun actionPerformed(e: AnActionEvent) {
-                        service.subscribe(textField.text)
-                    }
+            val comboBox = JComboBox(arrayOf(Qos.AT_MOST_ONCE, Qos.AT_LEAST_ONCE, Qos.EXACTLY_ONCE))
+            comboBox.preferredSize = Dimension(20, comboBox.preferredSize.height) // Set fixed width
+
+            val subscribeAction = object : DumbAwareAction(
+                "Subscribing to ${textField.text}",
+                "Subscribing action",
+                AllIcons.Actions.Execute
+            ) {
+                override fun actionPerformed(e: AnActionEvent) {
+                    subscribeService.subscribe(textField.text, comboBox.selectedItem as Qos)
                 }
+            }
+            val subscribeButton = JButton("Subscribe")
+            subscribeButton.addActionListener {
+                subscribeAction.actionPerformed(AnActionEvent.createFromAnAction(subscribeAction, null, "", DataContext.EMPTY_CONTEXT))
+            }
 
-                cell(textField).resizableColumn().align(AlignX.FILL)
-                actionButton(subscribeAction)
+            // Set the layout and constraints
+            val gridBagLayout = GridBagLayout()
+            val constraints = GridBagConstraints()
+            val panel = JPanel(gridBagLayout)
+            // Add the JTextField to the panel
+            constraints.weightx = 0.7
+            constraints.fill = GridBagConstraints.HORIZONTAL
+            constraints.gridx = 0
+            constraints.gridy = 0
+            panel.add(textField, constraints)
+
+            // Add the JComboBox to the panel
+            constraints.weightx = 0.25
+            constraints.gridx = 1
+            panel.add(comboBox, constraints)
+
+            // Add the publish button to the panel
+            constraints.weightx = 0.05
+            constraints.gridx = 2
+            panel.add(subscribeButton, constraints)
+            row {
+               cell(panel).align(AlignX.FILL)
             }
         }
     }
@@ -95,9 +123,7 @@ class SubscribeView {
             val row = JPanel(BorderLayout())
             row.border = null;
 
-            val label = JLabel(message.messageDTO.topic)
-            label.border = BorderFactory.createEmptyBorder(5, 0, 5, 0) // Adjust padding as needed
-            row.add(label, BorderLayout.WEST)
+            row.add(getRowContent(message), BorderLayout.WEST)
 
             // Add a line border at the bottom of the row, except for the last row
             if (rowContainer.components.isNotEmpty()) {
