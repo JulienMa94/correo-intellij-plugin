@@ -14,16 +14,16 @@ import org.correomqtt.core.model.Qos
 import org.correomqtt.core.pubsub.IncomingMessageEvent
 import org.correomqtt.core.pubsub.SubscribeEvent
 import org.correomqtt.core.pubsub.UnsubscribeEvent
+import org.correomqtt.di.Bean
+import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Observes
-import org.correomqtt.di.SingletonBean
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import javax.swing.*
-import javax.swing.border.LineBorder
 
-@SingletonBean
+@DefaultBean
 class SubscribeView {
     private val subscribeService = service<SubscribeService>()
     private val content: JPanel = JPanel(BorderLayout())
@@ -87,7 +87,14 @@ class SubscribeView {
             }
             val subscribeButton = JButton("Subscribe")
             subscribeButton.addActionListener {
-                subscribeAction.actionPerformed(AnActionEvent.createFromAnAction(subscribeAction, null, "", DataContext.EMPTY_CONTEXT))
+                subscribeAction.actionPerformed(
+                    AnActionEvent.createFromAnAction(
+                        subscribeAction,
+                        null,
+                        "",
+                        DataContext.EMPTY_CONTEXT
+                    )
+                )
             }
 
             // Set the layout and constraints
@@ -111,7 +118,7 @@ class SubscribeView {
             constraints.gridx = 2
             panel.add(subscribeButton, constraints)
             row {
-               cell(panel).align(AlignX.FILL)
+                cell(panel).align(AlignX.FILL)
             }
         }
     }
@@ -121,7 +128,6 @@ class SubscribeView {
             val colorsScheme = EditorColorsManager.getInstance().globalScheme
 
             val row = JPanel(BorderLayout())
-            row.border = null;
 
             row.add(getRowContent(message), BorderLayout.WEST)
 
@@ -131,7 +137,7 @@ class SubscribeView {
                 lastRow.border = BorderFactory.createMatteBorder(0, 0, 1, 0, colorsScheme.defaultBackground)
             }
             row.preferredSize = Dimension(rowContainer.width, 50)
-            row.border = LineBorder(colorsScheme.defaultBackground)
+            row.border = null
             row.maximumSize = Dimension(Int.MAX_VALUE, 50)
             row.minimumSize = Dimension(rowContainer.width, 50)
 
