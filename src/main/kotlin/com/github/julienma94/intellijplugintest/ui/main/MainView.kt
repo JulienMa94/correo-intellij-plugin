@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.content.ContentFactory
+import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
 import javax.swing.BorderFactory
 import javax.swing.JPanel
@@ -26,7 +27,7 @@ class MainView : ToolWindowFactory {
     class ToolWindow() {
         private val content: JPanel = JPanel(BorderLayout())
         private val splitter: JBSplitter = JBSplitter(false, 0.2f)
-        private val connectionManager: ConnectionTree = ConnectionTree()
+        private val connectionManager: ConnectionTree = SoyDi.inject(ConnectionTree::class.java)
         private val tabManager: TabManager = TabManager()
 
 

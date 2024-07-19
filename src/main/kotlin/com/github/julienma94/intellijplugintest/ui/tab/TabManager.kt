@@ -7,6 +7,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.components.service
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBTabbedPane
+import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.*
@@ -95,7 +96,7 @@ class TabManager() {
 
     private fun getTabContent(): JBSplitter {
         val splitter = JBSplitter(false, 0.5f)
-        val subscribeView = SubscribeView()
+        val subscribeView = SoyDi.inject(SubscribeView::class.java)
         val publishView = PublishView()
 
         splitter.firstComponent = subscribeView.getSubscribeContent()
