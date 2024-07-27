@@ -8,7 +8,7 @@ import org.correomqtt.core.connection.ConnectionStateChangedEvent
 import org.correomqtt.core.model.ConnectionConfigDTO
 import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Observes
-import java.awt.BorderLayout
+import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JLabel
@@ -58,28 +58,77 @@ class ConnectionTree() {
                 val component = super.getTreeCellRendererComponent(
                     tree, value, sel, expanded, leaf, row, hasFocus
                 )
-                openIcon = AllIcons.Actions.ListFiles
-                closedIcon = AllIcons.Actions.ListFiles
+                openIcon = AllIcons.Webreferences.MessageQueue
+                closedIcon = AllIcons.Webreferences.MessageQueue
 
                 if (leaf && value is DefaultMutableTreeNode) {
                     val connectionInfo = value.userObject as? ConnectionConfigDTO
                     if (connectionInfo != null) {
                         // Create a custom panel to hold the text and the icon
-                        val panel = JPanel(BorderLayout())
+                        // Create a custom panel to hold the icons and text
+                        val panel = JPanel(GridBagLayout())
                         panel.isOpaque = false
+                        val gbc = GridBagConstraints()
 
-                        // Create a label for the text
-                        val labelText = "${connectionInfo.name} | ${connectionInfo.hostAndPort}"
-                        val textLabel = JLabel(labelText)
-
-                        // Add the label and the icon to the panel
-                        panel.add(textLabel, BorderLayout.WEST)
+                        // Server icon
+                        val serverIconLabel = JLabel(AllIcons.Webreferences.Server)
+                        serverIconLabel.preferredSize = Dimension(16, 16)
+                        gbc.gridx = 0
+                        gbc.gridy = 0
+                        gbc.insets = Insets(0, 0, 0, 5) // Right padding
+                        panel.add(serverIconLabel, gbc)
 
                         val connectionState = connectionStateMap[connectionInfo.id]
 
+                        gbc.gridx = 1
+                        gbc.insets = Insets(0, 0, 0, 5) // Right padding
+
+                        when (connectionState) {
+                            ConnectionState.CONNECTED -> {
+                                val checkLabel = JLabel(AllIcons.General.InspectionsOK)
+                                checkLabel.preferredSize = Dimension(16, 16)
+                                panel.add(checkLabel, gbc)
+                            }
+
+                            ConnectionState.DISCONNECTED_GRACEFUL, ConnectionState.DISCONNECTED_UNGRACEFUL, ConnectionState.DISCONNECTING -> {
+                                val crossLabel = JLabel(AllIcons.General.Error)
+                                crossLabel.preferredSize = Dimension(16, 16)
+                                panel.add(crossLabel, gbc)
+                            }
+
+                            ConnectionState.CONNECTING -> {
+                                val loadingLabel = JLabel(AllIcons.Actions.Refresh)
+                                loadingLabel.preferredSize = Dimension(16, 16)
+                                panel.add(loadingLabel, gbc)
+                            }
+
+                            ConnectionState.RECONNECTING -> {
+                                val loadingLabel = JLabel(AllIcons.Actions.Refresh)
+                                loadingLabel.preferredSize = Dimension(16, 16)
+                                panel.add(loadingLabel, gbc)
+                            }
+
+                            null -> {
+                                val loadingLabel = JLabel(AllIcons.General.Error)
+                                loadingLabel.preferredSize = Dimension(16, 16)
+                                panel.add(loadingLabel, gbc)
+                            }
+                        }
+
+                        // Create a label for the text
+                        val labelText = "${connectionInfo.name}  (${connectionInfo.hostAndPort})"
+                        val textLabel = JLabel(labelText)
+
+                        // Add the text label to the panel
+                        gbc.gridx = 2
+                        gbc.weightx = 1.0
+                        gbc.fill = GridBagConstraints.HORIZONTAL
+
+                        // Add the label and the icon to the panel
+                        panel.add(textLabel, gbc)
+
                         if (connectionState == ConnectionState.CONNECTED) {
-                            val checkLabel = JLabel(AllIcons.General.InspectionsOK)
-                            panel.add(checkLabel, BorderLayout.EAST)
+                            textLabel.font = textLabel.font.deriveFont(Font.BOLD)
                         }
 
                         return panel

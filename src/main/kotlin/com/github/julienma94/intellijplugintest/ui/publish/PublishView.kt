@@ -20,17 +20,13 @@ import org.fife.ui.autocomplete.CompletionProvider
 import org.fife.ui.autocomplete.DefaultCompletionProvider
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
-import java.awt.Dimension
-import java.awt.Font
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import javax.swing.JButton
-import javax.swing.JComboBox
-import javax.swing.JPanel
-import javax.swing.JTextField
+import java.awt.*
+import javax.swing.*
+import javax.swing.border.Border
 
 class PublishView {
     private val publishService = service<PublishService>()
+    private val content = JPanel(BorderLayout())
 
     private fun getEditorFont(colorsScheme: EditorColorsScheme): Font {
         // Retrieve the editor font from the current scheme
@@ -62,7 +58,7 @@ class PublishView {
     }
 
     private fun createJsonTextArea(): RSyntaxTextArea {
-        val textArea = RSyntaxTextArea(20, 60)
+        val textArea = RSyntaxTextArea()
         textArea.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_JSON
         textArea.isCodeFoldingEnabled = true
 
@@ -74,65 +70,71 @@ class PublishView {
         return textArea
     }
 
-    fun getPublishContent(): DialogPanel {
-        return panel {
-            val topicTextField = JTextField()
-            topicTextField.preferredSize = Dimension(350, topicTextField.preferredSize.height) // Set fixed width
-            val textArea = createJsonTextArea()
+    fun getPublishContent(): JPanel {
+        content.layout = BorderLayout()
 
-            val comboBox = JComboBox(arrayOf(Qos.AT_MOST_ONCE, Qos.AT_LEAST_ONCE, Qos.EXACTLY_ONCE))
-            comboBox.preferredSize = Dimension(20, comboBox.preferredSize.height) // Set fixed width
+        val textArea = createJsonTextArea()
+        val rowScrollPane = JScrollPane(textArea)
+        rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+        rowScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        rowScrollPane.preferredSize = Dimension(content.width, content.height)
+        rowScrollPane.border = null
 
-            val publishAction = object : DumbAwareAction(
-                "Publishing to ${topicTextField.text}",
-                "Subscribing action",
-                AllIcons.Actions.Execute
-            ) {
-                override fun actionPerformed(e: AnActionEvent) {
-                    publishService.publish(topicTextField.text, textArea.text, comboBox.selectedItem as Qos)
-                }
-            }
-
-            val publishButton = JButton("Publish")
-            publishButton.addActionListener {
-                publishAction.actionPerformed(
-                    AnActionEvent.createFromAnAction(
-                        publishAction,
-                        null,
-                        "",
-                        DataContext.EMPTY_CONTEXT
-                    )
-                )
-            }
+        val topicTextField = JTextField()
+        topicTextField.preferredSize = Dimension(350, topicTextField.preferredSize.height) // Set fixed width
 
 
-            // Set the layout and constraints
-            val gridBagLayout = GridBagLayout()
-            val constraints = GridBagConstraints()
-            val panel = JPanel(gridBagLayout)
-            // Add the JTextField to the panel
-            constraints.weightx = 0.7
-            constraints.fill = GridBagConstraints.HORIZONTAL
-            constraints.gridx = 0
-            constraints.gridy = 0
-            panel.add(topicTextField, constraints)
+        val comboBox = JComboBox(arrayOf(Qos.AT_MOST_ONCE, Qos.AT_LEAST_ONCE, Qos.EXACTLY_ONCE))
+        comboBox.preferredSize = Dimension(20, comboBox.preferredSize.height) // Set fixed width
 
-            // Add the JComboBox to the panel
-            constraints.weightx = 0.25
-            constraints.gridx = 1
-            panel.add(comboBox, constraints)
-
-            // Add the publish button to the panel
-            constraints.weightx = 0.05
-            constraints.gridx = 2
-            panel.add(publishButton, constraints)
-
-            row {
-                cell(panel).align(AlignX.FILL)
-            }
-            row {
-                cell(textArea).resizableColumn().align(AlignX.FILL)
+        val publishAction = object : DumbAwareAction(
+            "Publishing to ${topicTextField.text}",
+            "Subscribing action",
+            AllIcons.Actions.Execute
+        ) {
+            override fun actionPerformed(e: AnActionEvent) {
+                publishService.publish(topicTextField.text, textArea.text, comboBox.selectedItem as Qos)
             }
         }
+
+        val publishButton = JButton("Publish")
+        publishButton.addActionListener {
+            publishAction.actionPerformed(
+                AnActionEvent.createFromAnAction(
+                    publishAction,
+                    null,
+                    "",
+                    DataContext.EMPTY_CONTEXT
+                )
+            )
+        }
+
+
+        // Set the layout and constraints
+        val gridBagLayout = GridBagLayout()
+        val constraints = GridBagConstraints()
+        val panel = JPanel(gridBagLayout)
+        // Add the JTextField to the panel
+        constraints.weightx = 0.7
+        constraints.fill = GridBagConstraints.HORIZONTAL
+        constraints.gridx = 0
+        constraints.gridy = 0
+        panel.add(topicTextField, constraints)
+
+        // Add the JComboBox to the panel
+        constraints.weightx = 0.25
+        constraints.gridx = 1
+        panel.add(comboBox, constraints)
+
+        // Add the publish button to the panel
+        constraints.weightx = 0.05
+        constraints.gridx = 2
+        panel.add(publishButton, constraints)
+
+        content.add(panel, BorderLayout.NORTH)
+        content.add(rowScrollPane, BorderLayout.CENTER)
+
+        return content;
+
     }
 }
