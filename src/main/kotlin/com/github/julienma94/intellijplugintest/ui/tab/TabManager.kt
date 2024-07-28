@@ -5,12 +5,14 @@ import com.github.julienma94.intellijplugintest.ui.publish.PublishView
 import com.github.julienma94.intellijplugintest.ui.subscribe.SubscribeView
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBTabbedPane
 import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.*
+import javax.swing.border.EmptyBorder
 
 class TabManager() {
     private val tabbedPane = JBTabbedPane()
@@ -98,9 +100,23 @@ class TabManager() {
         val splitter = JBSplitter(false, 0.5f)
         val subscribeView = SoyDi.inject(SubscribeView::class.java)
         val publishView = PublishView()
+        val colorsScheme = EditorColorsManager.getInstance().globalScheme
 
-        splitter.firstComponent = subscribeView.getSubscribeContent()
-        splitter.secondComponent = publishView.getPublishContent()
+        val subscribeContainer = JPanel(BorderLayout())
+        subscribeContainer.border = BorderFactory.createMatteBorder(0, 0, 0, 1, colorsScheme.defaultBackground)
+
+        val subscribeContentContainer = JPanel(BorderLayout())
+        subscribeContentContainer.border = EmptyBorder(8, 16, 8, 16)
+        subscribeContentContainer.add(subscribeView.getSubscribeContent(), BorderLayout.CENTER)
+
+        subscribeContainer.add(subscribeContentContainer)
+
+        val publishContainer = JPanel(BorderLayout())
+        publishContainer.border = EmptyBorder(8, 16, 8, 16)
+        publishContainer.add(publishView.getPublishContent(), BorderLayout.CENTER)
+
+        splitter.firstComponent = subscribeContainer
+        splitter.secondComponent = publishContainer
 
         return splitter
     }

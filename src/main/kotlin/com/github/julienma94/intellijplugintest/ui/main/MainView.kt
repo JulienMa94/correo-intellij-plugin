@@ -1,5 +1,6 @@
 package com.github.julienma94.intellijplugintest.ui.main
 
+import com.github.julienma94.intellijplugintest.ui.common.DefaultPanel
 import com.github.julienma94.intellijplugintest.ui.connection.ConnectionTree
 import com.github.julienma94.intellijplugintest.ui.tab.TabManager
 import com.intellij.openapi.editor.colors.EditorColorsManager
@@ -12,6 +13,7 @@ import java.awt.BorderLayout
 import javax.swing.BorderFactory
 import javax.swing.JPanel
 import javax.swing.JScrollPane
+import javax.swing.border.EmptyBorder
 
 class MainView : ToolWindowFactory {
 
@@ -29,6 +31,7 @@ class MainView : ToolWindowFactory {
         private val splitter: JBSplitter = JBSplitter(false, 0.12f)
         private val connectionManager: ConnectionTree = SoyDi.inject(ConnectionTree::class.java)
         private val tabManager: TabManager = TabManager()
+        private val defaultPanel: JPanel = DefaultPanel().getContent("No connection selected");
 
 
         init {
@@ -40,12 +43,25 @@ class MainView : ToolWindowFactory {
             val customBorder = BorderFactory.createMatteBorder(0, 0, 0, 1, colorsScheme.defaultBackground)
             splitter.firstComponent.border = customBorder
             splitter.secondComponent.border = null
-
             content.add(splitter, BorderLayout.CENTER)
+
+            updateView()
         }
 
         private fun onDoubleClick(tabTitle: String, connectionId: String) {
             tabManager.createTab(connectionId, tabTitle)
+            updateView()
+        }
+
+        private fun updateView() {
+            if (tabManager.getTabbedPane().tabCount == 0) {
+                splitter.secondComponent = defaultPanel
+            } else {
+                splitter.secondComponent = JScrollPane(tabManager.getTabbedPane())
+                splitter.secondComponent.border = null
+            }
+            content.revalidate()
+            content.repaint()
         }
 
         fun getContent(): JPanel {

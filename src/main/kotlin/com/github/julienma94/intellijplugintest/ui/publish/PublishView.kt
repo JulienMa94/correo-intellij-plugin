@@ -1,6 +1,5 @@
 package com.github.julienma94.intellijplugintest.ui.publish
 
-import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
 import com.github.julienma94.intellijplugintest.core.services.publish.PublishService
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -11,9 +10,6 @@ import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.project.DumbAwareAction
-import com.intellij.openapi.ui.DialogPanel
-import com.intellij.ui.dsl.builder.AlignX
-import com.intellij.ui.dsl.builder.panel
 import org.correomqtt.core.model.Qos
 import org.fife.ui.autocomplete.AutoCompletion
 import org.fife.ui.autocomplete.CompletionProvider
@@ -22,7 +18,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import java.awt.*
 import javax.swing.*
-import javax.swing.border.Border
+import javax.swing.border.EmptyBorder
 
 class PublishView {
     private val publishService = service<PublishService>()
@@ -78,7 +74,7 @@ class PublishView {
         rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.preferredSize = Dimension(content.width, content.height)
-        rowScrollPane.border = null
+        rowScrollPane.border = EmptyBorder(8, 2, 8, 2)
 
         val topicTextField = JTextField()
         topicTextField.preferredSize = Dimension(350, topicTextField.preferredSize.height) // Set fixed width
@@ -118,16 +114,12 @@ class PublishView {
         constraints.weightx = 0.7
         constraints.fill = GridBagConstraints.HORIZONTAL
         constraints.gridx = 0
-        constraints.gridy = 0
         panel.add(topicTextField, constraints)
 
-        // Add the JComboBox to the panel
-        constraints.weightx = 0.25
+
         constraints.gridx = 1
         panel.add(comboBox, constraints)
 
-        // Add the publish button to the panel
-        constraints.weightx = 0.05
         constraints.gridx = 2
         panel.add(publishButton, constraints)
 
