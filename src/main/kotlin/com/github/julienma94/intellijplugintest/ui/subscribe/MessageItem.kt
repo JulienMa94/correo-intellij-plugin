@@ -50,7 +50,6 @@ class MessageItem {
         val payload = JLabel(message.messageDTO.payload)
         payloadContainer.add(payload)
 
-
         rowBody.add(payloadContainer)
 
         row.border = customBorder

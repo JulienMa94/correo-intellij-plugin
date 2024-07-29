@@ -52,7 +52,6 @@ class SubscribeView {
 
     fun onSubscribeToTopic(@Observes event: SubscribeEvent) {
         println("Received subscription event for topic ${event.subscriptionDTO.topic}")
-
         updateAccordion()
     }
 
@@ -169,66 +168,62 @@ class SubscribeView {
 
     private fun updateAccordion() {
         SwingUtilities.invokeLater {
-            rowContainer.removeAll()
             val colorsScheme = EditorColorsManager.getInstance().globalScheme
 
             if (messages.isEmpty()) {
                 val defaultPanel = DefaultPanel().getContent("Subscribe to a topic to see received messages")
                 rowContainer.add(defaultPanel)
             } else {
+                rowContainer.removeAll()
                 for ((topic, messages) in messages) {
+                    // Accordion Topic Panel
                     val topicPanel = JPanel(BorderLayout())
                     topicPanel.border = null
 
+                    // Accordion Header Panel
                     val headerPanel = JPanel(BorderLayout())
-                    headerPanel.border = EmptyBorder(5, 5, 5, 5)
+                    headerPanel.border = BorderFactory.createMatteBorder(0, 0, 1, 0, colorsScheme.defaultBackground)
+                    headerPanel.preferredSize = Dimension(rowContainer.width, 50)
+                    headerPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
+                    headerPanel.minimumSize = Dimension(rowContainer.width, 50)
+
                     val topicLabel = JLabel(topic)
                     topicLabel.font = topicLabel.font.deriveFont(Font.BOLD)
 
                     val countLabel = JLabel(messages.size.toString())
                     countLabel.border = EmptyBorder(5, 5, 5, 5)
 
-                    val icon =
-                        if (displayedTopics.contains(topic)) AllIcons.General.ArrowDown else AllIcons.General.ArrowRight
-                    val iconLabel = JLabel(icon)
                     headerPanel.add(topicLabel, BorderLayout.WEST)
                     headerPanel.add(countLabel, BorderLayout.CENTER)
-                    headerPanel.add(iconLabel, BorderLayout.EAST)
 
-                    headerPanel.border = BorderFactory.createMatteBorder(0, 0, 1, 0, colorsScheme.defaultBackground)
-                    headerPanel.preferredSize = Dimension(rowContainer.width, 50)
-                    headerPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
-                    headerPanel.minimumSize = Dimension(rowContainer.width, 50)
-
+                    // Add to accordion
                     topicPanel.add(headerPanel, BorderLayout.NORTH)
 
+                    // Accordion Body Panel
                     val messagePanel = JPanel()
-                    val messageRoot = JScrollPane(messagePanel)
-                    messageRoot.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
-                    messageRoot.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
-                    messageRoot.border = null
-
-                    messagePanel.preferredSize = Dimension(messageRoot.width, 200)
-                    messagePanel.maximumSize = Dimension(messageRoot.width, 200)
-
+                    messagePanel.preferredSize = Dimension(rowContainer.width, rowContainer.height)
+                    messagePanel.maximumSize = Dimension(rowContainer.width, rowContainer.height)
                     messagePanel.layout = BoxLayout(messagePanel, BoxLayout.Y_AXIS)
                     messagePanel.isVisible = displayedTopics.contains(topic)
 
+                    // Set the size of the topic panel based on the number of messages
                     topicPanel.preferredSize = if (messagePanel.isVisible) Dimension(
                         rowContainer.width,
-                        50 + 50 * messages.size
+                        50 + 100 * messages.size
                     ) else Dimension(rowContainer.width, 50)
+
                     topicPanel.maximumSize = if (messagePanel.isVisible) Dimension(
                         Int.MAX_VALUE,
-                        50 + 50 * messages.size
+                        50 + 100 * messages.size
                     ) else Dimension(Int.MAX_VALUE, 50)
+
                     topicPanel.minimumSize = if (messagePanel.isVisible) Dimension(
                         rowContainer.width,
-                        50 + 50 * messages.size
+                        50 + 100 * messages.size
                     ) else Dimension(rowContainer.width, 50)
 
+                    // Single message item
                     val messageItem = MessageItem();
-
                     headerPanel.addMouseListener(object : MouseAdapter() {
                         override fun mouseClicked(e: MouseEvent?) {
                             messagePanel.isVisible = !messagePanel.isVisible
@@ -237,12 +232,12 @@ class SubscribeView {
                                 displayedTopics.add(topic)
                                 messagePanel.removeAll()
                                 for (msg in messages) {
-                                    messagePanel.add(messageItem.getContent(msg, rowContainer.width))
+                                    messagePanel.add(messageItem.getContent(msg, messagePanel.width))
                                 }
 
-                                topicPanel.preferredSize = Dimension(rowContainer.width, 50 + 50 * messages.size)
-                                topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50 + 50 * messages.size)
-                                topicPanel.minimumSize = Dimension(rowContainer.width, 50 + 50 * messages.size)
+                                topicPanel.preferredSize = Dimension(rowContainer.width, 50 + 100 * messages.size)
+                                topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50 + 100 * messages.size)
+                                topicPanel.minimumSize = Dimension(rowContainer.width, 50 + 100 * messages.size)
                             } else {
                                 displayedTopics.remove(topic)
                                 topicPanel.preferredSize = Dimension(rowContainer.width, 50)
@@ -250,18 +245,21 @@ class SubscribeView {
                                 topicPanel.minimumSize = Dimension(rowContainer.width, 50)
                             }
 
-                            iconLabel.icon =
-                                if (messagePanel.isVisible) AllIcons.General.ArrowDown else AllIcons.General.ArrowRight
                             rowContainer.revalidate()
                             rowContainer.repaint()
                         }
                     })
 
+                    // Add messages to the topic message panel
                     for (msg in messages) {
-                        messagePanel.add(messageItem.getContent(msg, rowContainer.width))
+                        val messageContainer = JPanel(BorderLayout())
+                        messageContainer.border = EmptyBorder(0, 0, 0, 0)
+                        messageContainer.add(messageItem.getContent(msg, messagePanel.width))
+
+                        messagePanel.add(messageContainer)
                     }
 
-                    topicPanel.add(messageRoot, BorderLayout.CENTER)
+                    topicPanel.add(messagePanel, BorderLayout.CENTER)
                     rowContainer.add(topicPanel)
                 }
             }
