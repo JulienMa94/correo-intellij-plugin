@@ -26,14 +26,14 @@ import javax.swing.border.EmptyBorder
 class SubscribeView {
     private val subscribeService = service<SubscribeService>()
     private val content: JPanel = JPanel(BorderLayout())
-    private val rowContainer: JPanel = JPanel()
+    private val messageContainer: JPanel = JPanel()
 
     private val messages: MutableMap<String, MutableList<IncomingMessageEvent>> = mutableMapOf()
     private val displayedTopics = mutableSetOf<String>();
 
     init {
-        rowContainer.layout = BoxLayout(rowContainer, BoxLayout.Y_AXIS)
-        rowContainer.border = EmptyBorder(16, 8, 16, 8)
+        messageContainer.layout = BoxLayout(messageContainer, BoxLayout.Y_AXIS)
+        messageContainer.border = EmptyBorder(0, 0, 0, 0)
         updateAccordion()
     }
 
@@ -46,8 +46,10 @@ class SubscribeView {
     private fun addMessageToMap(message: IncomingMessageEvent) {
         val topic = message.messageDTO.topic
         val currentMessages = messages.getOrDefault(topic, mutableListOf())
-        currentMessages.add(message)
-        messages[topic] = currentMessages
+        val newMessage = mutableListOf(message)
+
+        val newMessages = newMessage + currentMessages
+        messages[topic] = newMessages.toMutableList()
     }
 
     fun onSubscribeToTopic(@Observes event: SubscribeEvent) {
@@ -64,7 +66,7 @@ class SubscribeView {
     fun getSubscribeContent(): JPanel {
         content.layout = BorderLayout()
 
-        val rowScrollPane = JScrollPane(rowContainer)
+        val rowScrollPane = JScrollPane(messageContainer)
         rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         rowScrollPane.preferredSize = Dimension(content.width, content.height)
@@ -167,104 +169,86 @@ class SubscribeView {
     }
 
     private fun updateAccordion() {
-        SwingUtilities.invokeLater {
+        messageContainer.removeAll() // Clear the container
+
+        if (messages.isEmpty()) {
+            val defaultPanel = DefaultPanel().getContent("Subscribe to a topic to see received messages")
+            messageContainer.add(defaultPanel)
+        } else {
             val colorsScheme = EditorColorsManager.getInstance().globalScheme
 
-            if (messages.isEmpty()) {
-                val defaultPanel = DefaultPanel().getContent("Subscribe to a topic to see received messages")
-                rowContainer.add(defaultPanel)
-            } else {
-                rowContainer.removeAll()
-                for ((topic, messages) in messages) {
-                    // Accordion Topic Panel
-                    val topicPanel = JPanel(BorderLayout())
-                    topicPanel.border = null
+            for ((topic, messages) in messages) {
+                val topicPanel = JPanel(BorderLayout())
+                topicPanel.border = null
 
-                    // Accordion Header Panel
-                    val headerPanel = JPanel(BorderLayout())
-                    headerPanel.border = BorderFactory.createMatteBorder(0, 0, 1, 0, colorsScheme.defaultBackground)
-                    headerPanel.preferredSize = Dimension(rowContainer.width, 50)
-                    headerPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
-                    headerPanel.minimumSize = Dimension(rowContainer.width, 50)
+                // Accordion Header Panel
+                val headerPanel = JPanel(BorderLayout())
+                headerPanel.border = BorderFactory.createMatteBorder(0, 0, 1, 0, colorsScheme.defaultBackground)
+                headerPanel.preferredSize = Dimension(content.width, 50)
+                headerPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
+                headerPanel.minimumSize = Dimension(content.width, 50)
 
-                    val topicLabel = JLabel(topic)
-                    topicLabel.font = topicLabel.font.deriveFont(Font.BOLD)
+                val topicLabel = JLabel(topic)
+                topicLabel.font = topicLabel.font.deriveFont(Font.BOLD)
 
-                    val countLabel = JLabel(messages.size.toString())
-                    countLabel.border = EmptyBorder(5, 5, 5, 5)
+                val countLabel = JLabel(messages.size.toString())
+                countLabel.border = EmptyBorder(5, 5, 5, 5)
 
-                    headerPanel.add(topicLabel, BorderLayout.WEST)
-                    headerPanel.add(countLabel, BorderLayout.CENTER)
+                headerPanel.add(topicLabel, BorderLayout.WEST)
+                headerPanel.add(countLabel, BorderLayout.CENTER)
 
-                    // Add to accordion
-                    topicPanel.add(headerPanel, BorderLayout.NORTH)
+                topicPanel.add(headerPanel, BorderLayout.NORTH)
 
-                    // Accordion Body Panel
-                    val messagePanel = JPanel()
-                    messagePanel.preferredSize = Dimension(rowContainer.width, rowContainer.height)
-                    messagePanel.maximumSize = Dimension(rowContainer.width, rowContainer.height)
-                    messagePanel.layout = BoxLayout(messagePanel, BoxLayout.Y_AXIS)
-                    messagePanel.isVisible = displayedTopics.contains(topic)
+                val messagePanel = JPanel()
+                messagePanel.layout = BoxLayout(messagePanel, BoxLayout.Y_AXIS)
+                messagePanel.isVisible = displayedTopics.contains(topic)
 
-                    // Set the size of the topic panel based on the number of messages
-                    topicPanel.preferredSize = if (messagePanel.isVisible) Dimension(
-                        rowContainer.width,
-                        50 + 100 * messages.size
-                    ) else Dimension(rowContainer.width, 50)
+                val messageItem = MessageItem()
 
-                    topicPanel.maximumSize = if (messagePanel.isVisible) Dimension(
-                        Int.MAX_VALUE,
-                        50 + 100 * messages.size
-                    ) else Dimension(Int.MAX_VALUE, 50)
+                headerPanel.addMouseListener(object : MouseAdapter() {
+                    override fun mouseClicked(e: MouseEvent?) {
+                        messagePanel.isVisible = !messagePanel.isVisible
 
-                    topicPanel.minimumSize = if (messagePanel.isVisible) Dimension(
-                        rowContainer.width,
-                        50 + 100 * messages.size
-                    ) else Dimension(rowContainer.width, 50)
-
-                    // Single message item
-                    val messageItem = MessageItem();
-                    headerPanel.addMouseListener(object : MouseAdapter() {
-                        override fun mouseClicked(e: MouseEvent?) {
-                            messagePanel.isVisible = !messagePanel.isVisible
-
-                            if (messagePanel.isVisible) {
-                                displayedTopics.add(topic)
-                                messagePanel.removeAll()
-                                for (msg in messages) {
-                                    messagePanel.add(messageItem.getContent(msg, messagePanel.width))
-                                }
-
-                                topicPanel.preferredSize = Dimension(rowContainer.width, 50 + 100 * messages.size)
-                                topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50 + 100 * messages.size)
-                                topicPanel.minimumSize = Dimension(rowContainer.width, 50 + 100 * messages.size)
-                            } else {
-                                displayedTopics.remove(topic)
-                                topicPanel.preferredSize = Dimension(rowContainer.width, 50)
-                                topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
-                                topicPanel.minimumSize = Dimension(rowContainer.width, 50)
+                        if (messagePanel.isVisible) {
+                            displayedTopics.add(topic)
+                            messagePanel.removeAll()
+                            for (msg in messages) {
+                                messagePanel.add(
+                                    messageItem.getContent(msg, content.width)
+                                )
                             }
 
-                            rowContainer.revalidate()
-                            rowContainer.repaint()
+                            topicPanel.preferredSize = Dimension(content.width, 50 + 100 * messages.size)
+                            topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50 + 100 * messages.size)
+                            topicPanel.minimumSize = Dimension(content.width, 50 + 100 * messages.size)
+                        } else {
+                            displayedTopics.remove(topic)
+                            topicPanel.preferredSize = Dimension(content.width, 50)
+                            topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
+                            topicPanel.minimumSize = Dimension(content.width, 50)
                         }
-                    })
 
-                    // Add messages to the topic message panel
-                    for (msg in messages) {
-                        val messageContainer = JPanel(BorderLayout())
-                        messageContainer.border = EmptyBorder(0, 0, 0, 0)
-                        messageContainer.add(messageItem.getContent(msg, messagePanel.width))
-
-                        messagePanel.add(messageContainer)
+                        content.revalidate()
+                        content.repaint()
                     }
+                })
 
-                    topicPanel.add(messagePanel, BorderLayout.CENTER)
-                    rowContainer.add(topicPanel)
+                // Add messages to the topic message panel
+                for (msg in messages) {
+                    val messageContainer = JPanel(BorderLayout())
+                    messageContainer.border = EmptyBorder(0, 0, 0, 0)
+
+                    val messageContent = messageItem.getContent(msg, content.width)
+                    messageContainer.add(messageContent, BorderLayout.CENTER)
+                    messagePanel.add(messageContainer)
                 }
+
+                topicPanel.add(messagePanel, BorderLayout.CENTER)
+                messageContainer.add(topicPanel)
             }
-            rowContainer.revalidate()
-            rowContainer.repaint()
         }
+
+        messageContainer.revalidate()
+        messageContainer.repaint()
     }
 }
