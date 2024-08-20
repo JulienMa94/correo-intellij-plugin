@@ -51,7 +51,10 @@ class ConnectionTree(): JPanel(BorderLayout()) {
             .setRemoveAction { removeNode() }
             .setAddIcon(AllIcons.General.Add)
 
-        add(decorator.createPanel(), BorderLayout.NORTH)
+        val root = decorator.createPanel()
+        root.border = BorderFactory.createMatteBorder(0, 0, 0, 1, UIUtil.getBoundsColor())
+
+        add(root, BorderLayout.CENTER)
 
         // Custom renderer for tree nodes
         tree.cellRenderer = object : DefaultTreeCellRenderer() {
@@ -176,18 +179,18 @@ class ConnectionTree(): JPanel(BorderLayout()) {
     }
 
     private fun addNode() {
-        // Add a new child node to the selected node or root if none is selected
-        val selectedNode = tree.selectionPath?.lastPathComponent as? DefaultMutableTreeNode ?: rootNode
-        val newNode = DefaultMutableTreeNode("New Node")
-        selectedNode.add(newNode)
-        treeModel.reload(selectedNode)
+        val dialog = AddConnectionDialog(project)
 
+        if (dialog.showAndGet()) {
+            val nodeName = dialog.getNodeName()
 
-        // Create the action for the toolbar
-        val addConnectionAction = object : DumbAwareAction("Add Connection", "Add a new connection", AllIcons.General.Add) {
-            override fun actionPerformed(e: AnActionEvent) {
-                // Handle the action for adding a new connection
-                println("Add Connection clicked")
+            if (nodeName.isNotBlank()) {
+                val newNode = DefaultMutableTreeNode(nodeName)
+
+                println("Received new node name: $nodeName")
+
+                rootNode.add(newNode)
+                treeModel.reload(rootNode)
             }
         }
     }

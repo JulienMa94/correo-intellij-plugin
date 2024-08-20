@@ -3,11 +3,13 @@ package com.github.julienma94.intellijplugintest.ui.subscribe
 import com.github.julienma94.intellijplugintest.core.services.subscribe.SubscribeService
 import com.github.julienma94.intellijplugintest.ui.common.DefaultPanel
 import com.intellij.icons.AllIcons
+import com.intellij.ide.IdeTooltip.Ui
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.util.ui.UIUtil
 import org.correomqtt.core.model.Qos
 import org.correomqtt.core.pubsub.IncomingMessageEvent
 import org.correomqtt.core.pubsub.SubscribeEvent
@@ -175,15 +177,22 @@ class SubscribeView {
             val defaultPanel = DefaultPanel().getContent("Subscribe to a topic to see received messages")
             messageContainer.add(defaultPanel)
         } else {
-            val colorsScheme = EditorColorsManager.getInstance().globalScheme
 
             for ((topic, messages) in messages) {
                 val topicPanel = JPanel(BorderLayout())
                 topicPanel.border = null
 
+                val isTopicDisplayed = displayedTopics.contains(topic)
+
+                if (!isTopicDisplayed) {
+                    topicPanel.preferredSize = Dimension(content.width, 50)
+                    topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
+                    topicPanel.minimumSize = Dimension(content.width, 50)
+                }
+
                 // Accordion Header Panel
                 val headerPanel = JPanel(BorderLayout())
-                headerPanel.border = BorderFactory.createMatteBorder(0, 0, 1, 0, colorsScheme.defaultBackground)
+                headerPanel.border = BorderFactory.createMatteBorder(0, 0, 1, 0, UIUtil.getBoundsColor())
                 headerPanel.preferredSize = Dimension(content.width, 50)
                 headerPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
                 headerPanel.minimumSize = Dimension(content.width, 50)
@@ -203,29 +212,26 @@ class SubscribeView {
                 messagePanel.layout = BoxLayout(messagePanel, BoxLayout.Y_AXIS)
                 messagePanel.isVisible = displayedTopics.contains(topic)
 
-                val messageItem = MessageItem()
-
                 headerPanel.addMouseListener(object : MouseAdapter() {
                     override fun mouseClicked(e: MouseEvent?) {
                         messagePanel.isVisible = !messagePanel.isVisible
+                        displayedTopics.add(topic)
+
+                        topicPanel.preferredSize = null
+                        topicPanel.maximumSize = null
+                        topicPanel.minimumSize = null
 
                         if (messagePanel.isVisible) {
-                            displayedTopics.add(topic)
                             messagePanel.removeAll()
                             for (msg in messages) {
-                                messagePanel.add(
-                                    messageItem.getContent(msg, content.width)
-                                )
+                                val messageItem = MessageItem(msg).getContent()
+                                messageItem.preferredSize = Dimension(content.width, 100)
+                                messageItem.maximumSize = Dimension(Int.MAX_VALUE, 100)
+                                messageItem.minimumSize = Dimension(content.width, 100)
+
+                                messagePanel.add(messageItem)
                             }
 
-                            topicPanel.preferredSize = Dimension(content.width, 50 + 100 * messages.size)
-                            topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50 + 100 * messages.size)
-                            topicPanel.minimumSize = Dimension(content.width, 50 + 100 * messages.size)
-                        } else {
-                            displayedTopics.remove(topic)
-                            topicPanel.preferredSize = Dimension(content.width, 50)
-                            topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
-                            topicPanel.minimumSize = Dimension(content.width, 50)
                         }
 
                         content.revalidate()
@@ -238,8 +244,12 @@ class SubscribeView {
                     val messageContainer = JPanel(BorderLayout())
                     messageContainer.border = EmptyBorder(0, 0, 0, 0)
 
-                    val messageContent = messageItem.getContent(msg, content.width)
-                    messageContainer.add(messageContent, BorderLayout.CENTER)
+                    val messageItem = MessageItem(msg).getContent()
+                    messageItem.preferredSize = Dimension(content.width, 100)
+                    messageItem.maximumSize = Dimension(Int.MAX_VALUE, 100)
+                    messageItem.minimumSize = Dimension(content.width, 100)
+
+                    messageContainer.add(messageItem, BorderLayout.CENTER)
                     messagePanel.add(messageContainer)
                 }
 

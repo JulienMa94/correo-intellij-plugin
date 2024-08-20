@@ -5,18 +5,16 @@ import com.github.julienma94.intellijplugintest.ui.connection.CONNECTION_SELECTE
 import com.github.julienma94.intellijplugintest.ui.connection.ConnectionSelectionListener
 import com.github.julienma94.intellijplugintest.ui.connection.ConnectionTree
 import com.github.julienma94.intellijplugintest.ui.tab.TabManager
-import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.content.ContentFactory
 import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Dimension
 import javax.swing.BorderFactory
 import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.border.EmptyBorder
 
 class MainView : ToolWindowFactory {
 
