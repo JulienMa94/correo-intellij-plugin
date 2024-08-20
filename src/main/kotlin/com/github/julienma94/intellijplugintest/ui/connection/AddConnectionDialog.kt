@@ -1,5 +1,9 @@
 package com.github.julienma94.intellijplugintest.ui.connection
 
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogWrapper
@@ -7,10 +11,15 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.GridBag
+import org.correomqtt.core.model.ConnectionConfigDTO
+import org.correomqtt.core.model.CorreoMqttVersion
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import java.util.*
+import javax.swing.JButton
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
@@ -23,8 +32,8 @@ class AddConnectionDialog(project: Project) : DialogWrapper(project) {
     private val passwordField = JBTextField()
     private val cleanSessionField = JBCheckBox()
     private val mqttVersionField = ComboBox<String>().apply {
-        addItem("3.1.1")
-        addItem("5.0")
+        addItem(CorreoMqttVersion.MQTT_3_1_1.toString())
+        addItem(CorreoMqttVersion.MQTT_5_0.toString())
     }
 
     init {
@@ -48,13 +57,48 @@ class AddConnectionDialog(project: Project) : DialogWrapper(project) {
         addRow(panel, gb, "Name", nameField)
         addRow(panel, gb, "URL", urlField)
         addRow(panel, gb, "Port", portField)
-        addRow(panel, gb, "Client ID", clientIdField)
+
+        val clientIdContainer = JPanel(BorderLayout())
+        val generateButton = JButton("Generate")
+
+        val generateUUIDAction = object : DumbAwareAction(
+            "",
+            "",
+            AllIcons.Actions.Execute
+        ) {
+            override fun actionPerformed(e: AnActionEvent) {
+                val myUuid = UUID.randomUUID()
+                clientIdField.text = myUuid.toString()
+                clientIdField.revalidate()
+                clientIdField.repaint()
+            }
+        }
+        generateButton.addActionListener {
+            generateUUIDAction.actionPerformed(
+                AnActionEvent.createFromAnAction(
+                    generateUUIDAction,
+                    null,
+                    "",
+                    DataContext.EMPTY_CONTEXT
+                )
+            )
+        }
+
+        clientIdContainer.add(generateButton, BorderLayout.WEST)
+        clientIdContainer.add(clientIdField, BorderLayout.CENTER)
+
+        panel.add(
+            JLabel("Client ID"),
+            gb.nextLine().next().weightx(0.2).anchor(GridBagConstraints.WEST).insetBottom(16)
+        )
+        panel.add(clientIdContainer, gb.next().weightx(0.6).fillCellHorizontally().insetBottom(16))
+
         addRow(panel, gb, "Username", userNameField)
         addRow(panel, gb, "Password", passwordField)
         addRow(panel, gb, "MQTT-Version", mqttVersionField)
 
         panel.add(JPanel(), gb.nextLine().next().weightx(0.2).anchor(GridBagConstraints.WEST).insetBottom(16))
-        panel.add(checkBoxContainer, gb.next().weightx(0.7).fillCellHorizontally().insetBottom(16))
+        panel.add(checkBoxContainer, gb.next().weightx(0.6).fillCellHorizontally().insetBottom(16))
 
         root.add(panel, BorderLayout.NORTH)
 
@@ -63,10 +107,25 @@ class AddConnectionDialog(project: Project) : DialogWrapper(project) {
 
     private fun addRow(panel: JPanel, gb: GridBag, labelText: String, component: JComponent, switch: Boolean = false) {
         panel.add(JBLabel(labelText), gb.nextLine().next().weightx(0.2).anchor(GridBagConstraints.WEST).insetBottom(16))
-        panel.add(component, gb.next().weightx(0.7).fillCellHorizontally().insetBottom(16))
+        panel.add(component, gb.next().weightx(0.6).fillCellHorizontally().insetBottom(16))
     }
 
-    fun getNodeName(): String {
-        return nameField.text
+    fun getConnectionDTO(): ConnectionConfigDTO {
+        val mqttVersion: CorreoMqttVersion = when (mqttVersionField.selectedItem) {
+            CorreoMqttVersion.MQTT_3_1_1.toString() -> CorreoMqttVersion.MQTT_3_1_1
+            CorreoMqttVersion.MQTT_5_0.toString() -> CorreoMqttVersion.MQTT_5_0
+            else -> CorreoMqttVersion.MQTT_3_1_1
+        }
+
+        return ConnectionConfigDTO.builder()
+            .name(nameField.text)
+            .url(urlField.text)
+            .port(portField.text.toInt())
+            .clientId(clientIdField.text)
+            .username(userNameField.text)
+            .password(passwordField.text)
+            .cleanSession(cleanSessionField.isSelected)
+            .mqttVersion(mqttVersion)
+            .build()
     }
 }

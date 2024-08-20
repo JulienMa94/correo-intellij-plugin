@@ -2,14 +2,8 @@ package com.github.julienma94.intellijplugintest.ui.connection
 
 import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.service
-import com.intellij.openapi.editor.colors.EditorColorsManager
-import com.intellij.openapi.editor.colors.EditorColorsScheme
-import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.impl.content.ToolWindowContentUi
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.UIUtil
@@ -22,8 +16,6 @@ import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
-import javax.swing.border.Border
-import javax.swing.border.EmptyBorder
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
@@ -182,16 +174,13 @@ class ConnectionTree(): JPanel(BorderLayout()) {
         val dialog = AddConnectionDialog(project)
 
         if (dialog.showAndGet()) {
-            val nodeName = dialog.getNodeName()
+            val connectionDTO = dialog.getConnectionDTO()
+            val newNode = DefaultMutableTreeNode(connectionDTO)
 
-            if (nodeName.isNotBlank()) {
-                val newNode = DefaultMutableTreeNode(nodeName)
+            println("Received new node name: $connectionDTO")
 
-                println("Received new node name: $nodeName")
-
-                rootNode.add(newNode)
-                treeModel.reload(rootNode)
-            }
+            rootNode.add(newNode)
+            treeModel.reload(rootNode)
         }
     }
 
