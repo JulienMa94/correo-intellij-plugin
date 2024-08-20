@@ -2,7 +2,14 @@ package com.github.julienma94.intellijplugintest.ui.connection
 
 import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.editor.colors.EditorColorsScheme
+import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.wm.impl.content.ToolWindowContentUi
+import com.intellij.util.ui.UIUtil
 import org.correomqtt.core.connection.ConnectionState
 import org.correomqtt.core.connection.ConnectionStateChangedEvent
 import org.correomqtt.core.model.ConnectionConfigDTO
@@ -11,9 +18,9 @@ import org.correomqtt.di.Observes
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JTree
+import javax.swing.*
+import javax.swing.border.Border
+import javax.swing.border.EmptyBorder
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
@@ -24,6 +31,7 @@ class ConnectionTree() {
     private val service = service<ConnectionManagerService>()
     private val tree: JTree = JTree()
     private val connectionStateMap = mutableMapOf<String, ConnectionState>()
+    private val colorScheme = EditorColorsManager.getInstance().globalScheme
 
     fun onConnectionStateChanged(@Observes event: ConnectionStateChangedEvent) {
         println("Received connection state change event ${event.state}")
@@ -32,7 +40,7 @@ class ConnectionTree() {
         tree.repaint()
     }
 
-    fun initializeConnectionTree(onDoubleClick: (String, String) -> Unit): JTree {
+    fun initializeConnectionTree(onDoubleClick: (String, String) -> Unit): JPanel {
         val connections = service.getConnections();
 
         // Tree setup
@@ -162,7 +170,44 @@ class ConnectionTree() {
             }
         })
 
-        return tree;
+
+
+        //Create Tree Scroll pane
+        val treeContainer = JScrollPane(tree)
+        treeContainer.border = null
+
+        // Create the toolbar
+        val toolbar = JToolBar()
+        toolbar.border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK)
+        toolbar.background = UIUtil.getPanelBackground()
+
+
+        // Create the action for the toolbar
+        val addConnectionAction = object : DumbAwareAction("Add Connection", "Add a new connection", AllIcons.General.Add) {
+            override fun actionPerformed(e: AnActionEvent) {
+                // Handle the action for adding a new connection
+                println("Add Connection clicked")
+            }
+        }
+
+        // Create the toolbar using ActionToolbar
+        val actionGroup = DefaultActionGroup().apply {
+            add(addConnectionAction)
+        }
+
+        val actionToolbar = com.intellij.openapi.actionSystem.ActionManager.getInstance()
+            .createActionToolbar("ConnectionToolbar", actionGroup, true)
+
+        actionToolbar.setTargetComponent(tree) // Target the tree component
+        toolbar.add(actionToolbar.component)
+
+        // Wrap the tree in a panel with a BorderLayout
+        val panel = JPanel(BorderLayout())
+        panel.border = EmptyBorder(0, 0, 0, 0)
+        panel.add(toolbar, BorderLayout.NORTH)
+        panel.add(treeContainer, BorderLayout.CENTER)
+
+        return panel
     }
 }
 
