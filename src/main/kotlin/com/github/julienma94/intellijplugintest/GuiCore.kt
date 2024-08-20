@@ -3,6 +3,8 @@ package com.github.julienma94.intellijplugintest
 import org.correomqtt.core.CoreManager
 import org.correomqtt.core.connection.ConnectionLifecycleTaskFactories
 import org.correomqtt.core.fileprovider.HistoryManager
+import org.correomqtt.core.fileprovider.SecretStoreProvider
+import org.correomqtt.core.keyring.KeyringFactory
 import org.correomqtt.core.pubsub.PublishTaskFactory
 import org.correomqtt.core.pubsub.SubscribeTaskFactory
 import org.correomqtt.core.settings.SettingsManager
@@ -12,31 +14,18 @@ import org.correomqtt.di.SingletonBean
 
 
 @SingletonBean
-class GuiCore {
+class GuiCore @Inject constructor(
+    private var coreManager: CoreManager,
+    private var connectionLifecycleTaskFactories: ConnectionLifecycleTaskFactories,
+    private var publishTaskFactory: PublishTaskFactory,
+    private var subscribeTaskFactory: SubscribeTaskFactory,
+    private var keyringFactory: KeyringFactory,
+    private var secretStoreProvider: SecretStoreProvider
+) {
 
-    private var coreManager: CoreManager
-    private var connectionManager: ConnectionManager
-    private var settingsManager: SettingsManager
-    private var historyManager: HistoryManager
-    private var connectionLifecycleTaskFactories: ConnectionLifecycleTaskFactories
-    private var publishTaskFactory: PublishTaskFactory
-    private var subscribeTaskFactory: SubscribeTaskFactory
-
-    @Inject
-    constructor(
-        coreManager: CoreManager,
-        connectionLifecycleTaskFactories: ConnectionLifecycleTaskFactories,
-        publishTaskFactory: PublishTaskFactory,
-        subscribeTaskFactory: SubscribeTaskFactory
-    ) {
-        this.connectionLifecycleTaskFactories = connectionLifecycleTaskFactories
-        this.publishTaskFactory = publishTaskFactory
-        this.subscribeTaskFactory = subscribeTaskFactory
-        this.coreManager = coreManager
-        connectionManager = coreManager.connectionManager
-        settingsManager = coreManager.settingsManager
-        historyManager = coreManager.historyManager
-    }
+    private var connectionManager: ConnectionManager = coreManager.connectionManager
+    private var settingsManager: SettingsManager = coreManager.settingsManager
+    private var historyManager: HistoryManager = coreManager.historyManager
 
     fun getConnectionManager(): ConnectionManager {
         return this.connectionManager;
@@ -60,5 +49,13 @@ class GuiCore {
 
     fun getConnectionLifecycleTaskFactory(): ConnectionLifecycleTaskFactories {
         return this.connectionLifecycleTaskFactories;
+    }
+
+    fun getSecretStoreProvider(): SecretStoreProvider {
+        return this.secretStoreProvider;
+    }
+
+    fun getKeyringFactory(): KeyringFactory {
+        return this.keyringFactory;
     }
 }

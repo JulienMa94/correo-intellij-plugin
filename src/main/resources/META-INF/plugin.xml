@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.github.julienma94.intellijplugintest</id>
     <name>intellij-plugin-test Template</name>
-    <vendor>Exxeta AG</vendor>
+    <vendor>Julien Marcq</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
@@ -40,6 +40,12 @@
                 serviceInterface="com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService"
                 serviceImplementation="com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerServiceImpl"
                 id="ConnectionManager"
+        />
+
+        <applicationService
+                serviceInterface="com.github.julienma94.intellijplugintest.core.services.secruity.KeyringManagerService"
+                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.secruity.KeyringManagerServiceImpl"
+                id="KeyringManager"
         />
     </extensions>
 
