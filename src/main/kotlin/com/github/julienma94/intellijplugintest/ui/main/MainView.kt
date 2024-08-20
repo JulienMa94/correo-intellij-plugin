@@ -1,6 +1,8 @@
 package com.github.julienma94.intellijplugintest.ui.main
 
 import com.github.julienma94.intellijplugintest.ui.common.DefaultPanel
+import com.github.julienma94.intellijplugintest.ui.connection.CONNECTION_SELECTED_TOPIC
+import com.github.julienma94.intellijplugintest.ui.connection.ConnectionSelectionListener
 import com.github.julienma94.intellijplugintest.ui.connection.ConnectionTree
 import com.github.julienma94.intellijplugintest.ui.tab.TabManager
 import com.intellij.openapi.editor.colors.EditorColorsManager
@@ -10,6 +12,7 @@ import com.intellij.ui.JBSplitter
 import com.intellij.ui.content.ContentFactory
 import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
+import java.awt.Dimension
 import javax.swing.BorderFactory
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -18,7 +21,7 @@ import javax.swing.border.EmptyBorder
 class MainView : ToolWindowFactory {
 
     override fun createToolWindowContent(project: Project, toolWindow: com.intellij.openapi.wm.ToolWindow) {
-        val myToolWindow = ToolWindow()
+        val myToolWindow = ToolWindow(project)
 
         val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(), null, false)
         toolWindow.contentManager.addContent(content)
@@ -26,42 +29,32 @@ class MainView : ToolWindowFactory {
 
     override fun shouldBeAvailable(project: Project) = true
 
-    class ToolWindow() {
+    class ToolWindow(project: Project) {
         private val content: JPanel = JPanel(BorderLayout())
         private val splitter: JBSplitter = JBSplitter(false, 0.12f)
-        private val connectionManager: ConnectionTree = SoyDi.inject(ConnectionTree::class.java)
+        private val connectionTree: ConnectionTree = SoyDi.inject(ConnectionTree::class.java)
         private val tabManager: TabManager = TabManager()
-        private val defaultPanel: JPanel = DefaultPanel().getContent("No connection selected");
-
 
         init {
-            val tree = connectionManager.initializeConnectionTree(::onDoubleClick)
-            val tabbedPane = tabManager.getTabbedPane();
-            splitter.firstComponent = JScrollPane(tree)
-            splitter.secondComponent = JScrollPane(tabbedPane)
-            val colorsScheme = EditorColorsManager.getInstance().globalScheme
-            val customBorder = BorderFactory.createMatteBorder(0, 0, 0, 1, colorsScheme.defaultBackground)
-            splitter.firstComponent.border = customBorder
+            connectionTree.addProject(project)
+            val connection = project.messageBus.connect()
+            splitter.border = null;
+
+            connection.subscribe(CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
+                override fun onConnectionSelected(name: String, id: String) {
+                    println("Connection selected: $name, $id")
+                    tabManager.createTab(id, name)
+                    splitter.secondComponent = tabManager.getTabbedPane()
+
+                    content.revalidate()
+                    content.repaint()
+                }
+            })
+            splitter.firstComponent = connectionTree
+            splitter.secondComponent = DefaultPanel().getContent("No connection selected")
+
             splitter.secondComponent.border = null
             content.add(splitter, BorderLayout.CENTER)
-
-            updateView()
-        }
-
-        private fun onDoubleClick(tabTitle: String, connectionId: String) {
-            tabManager.createTab(connectionId, tabTitle)
-            updateView()
-        }
-
-        private fun updateView() {
-            if (tabManager.getTabbedPane().tabCount == 0) {
-                splitter.secondComponent = defaultPanel
-            } else {
-                splitter.secondComponent = JScrollPane(tabManager.getTabbedPane())
-                splitter.secondComponent.border = null
-            }
-            content.revalidate()
-            content.repaint()
         }
 
         fun getContent(): JPanel {

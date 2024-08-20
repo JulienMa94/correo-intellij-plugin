@@ -1,11 +1,15 @@
 package com.github.julienma94.intellijplugintest.ui.tab
 
 import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
+import com.github.julienma94.intellijplugintest.ui.common.DefaultPanel
+import com.github.julienma94.intellijplugintest.ui.connection.CONNECTION_SELECTED_TOPIC
+import com.github.julienma94.intellijplugintest.ui.connection.ConnectionSelectionListener
 import com.github.julienma94.intellijplugintest.ui.publish.PublishView
 import com.github.julienma94.intellijplugintest.ui.subscribe.SubscribeView
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.project.Project
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBTabbedPane
 import org.correomqtt.di.SoyDi
@@ -19,6 +23,8 @@ class TabManager() {
     private val connectionService = service<ConnectionManagerService>()
 
     fun getTabbedPane(): JBTabbedPane {
+        tabbedPane.revalidate()
+        tabbedPane.repaint()
         return tabbedPane
     }
 
@@ -32,12 +38,10 @@ class TabManager() {
         }
 
         // Create tab content
-        val tabContent = JPanel(BorderLayout())
-        tabContent.add(getTabContent())
-
         // Add tab with custom tab component
-        tabbedPane.addTab(title, tabContent)
-        val tabIndex = tabbedPane.indexOfComponent(tabContent)
+        val content = getTabContent()
+        tabbedPane.addTab(title, content)
+        val tabIndex = tabbedPane.indexOfComponent(content)
         tabbedPane.setTabComponentAt(tabIndex, createTabComponent(title))
         connectionService.addConnectionId(tabIndex, connectionId)
 
@@ -96,28 +100,16 @@ class TabManager() {
     }
 
 
-    private fun getTabContent(): JBSplitter {
+    private fun getTabContent(): JPanel {
+        val root = JPanel(BorderLayout())
+        root.border = EmptyBorder(8, 16, 8, 16)
+
         val splitter = JBSplitter(false, 0.5f)
-        val subscribeView = SoyDi.inject(SubscribeView::class.java)
-        val publishView = PublishView()
-        val colorsScheme = EditorColorsManager.getInstance().globalScheme
+        splitter.firstComponent = SoyDi.inject(SubscribeView::class.java).getSubscribeContent()
+        splitter.secondComponent = PublishView().getPublishContent()
 
-        val subscribeContainer = JPanel(BorderLayout())
-        subscribeContainer.border = BorderFactory.createMatteBorder(0, 0, 0, 1, colorsScheme.defaultBackground)
+        root.add(splitter, BorderLayout.CENTER)
 
-        val subscribeContentContainer = JPanel(BorderLayout())
-        subscribeContentContainer.border = EmptyBorder(8, 16, 8, 16)
-        subscribeContentContainer.add(subscribeView.getSubscribeContent(), BorderLayout.CENTER)
-
-        subscribeContainer.add(subscribeContentContainer)
-
-        val publishContainer = JPanel(BorderLayout())
-        publishContainer.border = EmptyBorder(8, 16, 8, 16)
-        publishContainer.add(publishView.getPublishContent(), BorderLayout.CENTER)
-
-        splitter.firstComponent = subscribeContainer
-        splitter.secondComponent = publishContainer
-
-        return splitter
+        return root
     }
 }

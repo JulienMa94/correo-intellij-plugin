@@ -8,7 +8,10 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.impl.content.ToolWindowContentUi
+import com.intellij.ui.ToolbarDecorator
+import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.UIUtil
 import org.correomqtt.core.connection.ConnectionState
 import org.correomqtt.core.connection.ConnectionStateChangedEvent
@@ -26,31 +29,29 @@ import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 
 @DefaultBean
-class ConnectionTree() {
+class ConnectionTree(): JPanel(BorderLayout()) {
 
     private val service = service<ConnectionManagerService>()
-    private val tree: JTree = JTree()
+    private val rootNode = DefaultMutableTreeNode("MQTT Connections")
+    private val treeModel: DefaultTreeModel = DefaultTreeModel(rootNode)
+    private val tree = Tree(treeModel).apply { isRootVisible = true }
     private val connectionStateMap = mutableMapOf<String, ConnectionState>()
-    private val colorScheme = EditorColorsManager.getInstance().globalScheme
+    private lateinit var project: Project
 
-    fun onConnectionStateChanged(@Observes event: ConnectionStateChangedEvent) {
-        println("Received connection state change event ${event.state}")
-        connectionStateMap[event.connectionId] = event.state
-        tree.revalidate()
-        tree.repaint()
-    }
-
-    fun initializeConnectionTree(onDoubleClick: (String, String) -> Unit): JPanel {
+    init {
         val connections = service.getConnections();
 
-        // Tree setup
-        val root = DefaultMutableTreeNode("MQTT")
         connections.forEach {
             val connection = DefaultMutableTreeNode(it)
-            root.add(connection)
+            rootNode.add(connection)
         }
 
-        tree.model = DefaultTreeModel(root)
+        val decorator = ToolbarDecorator.createDecorator(tree)
+            .setAddAction { addNode() }
+            .setRemoveAction { removeNode() }
+            .setAddIcon(AllIcons.General.Add)
+
+        add(decorator.createPanel(), BorderLayout.NORTH)
 
         // Custom renderer for tree nodes
         tree.cellRenderer = object : DefaultTreeCellRenderer() {
@@ -146,7 +147,6 @@ class ConnectionTree() {
             }
         }
 
-
         // Add mouse listener to handle double-clicks
         tree.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
@@ -162,24 +162,25 @@ class ConnectionTree() {
                         if (connection != null) {
                             service.connect(connection.id)
                             if (nodeData != null) {
-                                onDoubleClick(nodeData.name, connection.id)
+                                project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC).onConnectionSelected(connection.name, connection.id)
                             }
                         }
                     }
                 }
             }
         })
+    }
 
+    fun addProject(project: Project) {
+        this.project = project
+    }
 
-
-        //Create Tree Scroll pane
-        val treeContainer = JScrollPane(tree)
-        treeContainer.border = null
-
-        // Create the toolbar
-        val toolbar = JToolBar()
-        toolbar.border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK)
-        toolbar.background = UIUtil.getPanelBackground()
+    private fun addNode() {
+        // Add a new child node to the selected node or root if none is selected
+        val selectedNode = tree.selectionPath?.lastPathComponent as? DefaultMutableTreeNode ?: rootNode
+        val newNode = DefaultMutableTreeNode("New Node")
+        selectedNode.add(newNode)
+        treeModel.reload(selectedNode)
 
 
         // Create the action for the toolbar
@@ -189,25 +190,25 @@ class ConnectionTree() {
                 println("Add Connection clicked")
             }
         }
+    }
 
-        // Create the toolbar using ActionToolbar
-        val actionGroup = DefaultActionGroup().apply {
-            add(addConnectionAction)
+    private fun removeNode() {
+        // Remove the selected node
+        val selectedPath = tree.selectionPath
+        if (selectedPath != null) {
+            val selectedNode = selectedPath.lastPathComponent as DefaultMutableTreeNode
+            if (selectedNode != rootNode) { // Prevent removing the root node
+                selectedNode.removeFromParent()
+                treeModel.reload(rootNode)
+            }
         }
+    }
 
-        val actionToolbar = com.intellij.openapi.actionSystem.ActionManager.getInstance()
-            .createActionToolbar("ConnectionToolbar", actionGroup, true)
-
-        actionToolbar.setTargetComponent(tree) // Target the tree component
-        toolbar.add(actionToolbar.component)
-
-        // Wrap the tree in a panel with a BorderLayout
-        val panel = JPanel(BorderLayout())
-        panel.border = EmptyBorder(0, 0, 0, 0)
-        panel.add(toolbar, BorderLayout.NORTH)
-        panel.add(treeContainer, BorderLayout.CENTER)
-
-        return panel
+    fun onConnectionStateChanged(@Observes event: ConnectionStateChangedEvent) {
+        println("Received connection state change event ${event.state}")
+        connectionStateMap[event.connectionId] = event.state
+        tree.revalidate()
+        tree.repaint()
     }
 }
 
