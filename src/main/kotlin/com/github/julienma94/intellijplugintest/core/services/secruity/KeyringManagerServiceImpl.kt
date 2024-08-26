@@ -13,14 +13,12 @@ import java.util.*
 class KeyringManagerServiceImpl : KeyringManagerService {
 
     private val guiCore: GuiCore = SoyDi.inject(GuiCore::class.java)
-
     private val settingsManager: SettingsManager = guiCore.getSettingsManager()
     private val secretStoreProvider: SecretStoreProvider = guiCore.getSecretStoreProvider()
     private val keyringFactory: KeyringFactory = guiCore.getKeyringFactory()
     private var masterPassword: String? = null
     private var keyring: Keyring? = null
     val KEYRING_LABEL: String = "CorreoMQTT_MasterPassword"
-
 
     override fun migrate(newKeyringIdentifier: String) {
         TODO("Not yet implemented")

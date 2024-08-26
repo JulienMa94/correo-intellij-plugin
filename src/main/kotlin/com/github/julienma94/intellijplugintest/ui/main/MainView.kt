@@ -11,14 +11,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.content.ContentFactory
+import io.ktor.network.tls.*
 import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
 class MainView : ToolWindowFactory {
-
-    private val keyringManagerService = service<KeyringManagerService>()
-
     override fun createToolWindowContent(project: Project, toolWindow: com.intellij.openapi.wm.ToolWindow) {
         val myToolWindow = ToolWindow(project)
         val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(), null, false)

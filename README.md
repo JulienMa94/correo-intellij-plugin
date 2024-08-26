@@ -41,6 +41,7 @@ To keep everything working, do not remove `<!-- ... -->` sections.
   - [ ] Implement the CorreoMQTT publish view toolbar
     - [ ] Clear topics
     - [ ] Open history
+- [ ] Fix subscription topic taking to much space
 - [ ] Implement the CorreoMQTT history views
   - [ ] Implement the CorreoMQTT history view for publish
     - [ ] save old message as cqm file

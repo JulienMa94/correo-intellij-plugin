@@ -12,13 +12,14 @@ class ApplicationActivationServiceImpl : ApplicationActivationService {
     private var isInitialized = false
 
     override fun init() {
-       if (!isInitialized) {
-           thisLogger().info(MyBundle.message("start"))
-           SoyDi.scan("org.correomqtt")
-           SoyDi.scan("com.github.julienma94");
-           app = SoyDi.inject(CorreoPlugin::class.java)
-           app.init()
-           isInitialized = true
-       }
+        if (!isInitialized) {
+            thisLogger().info(MyBundle.message("start"))
+            SoyDi.scan("org.correomqtt")
+            SoyDi.scan("com.github.julienma94");
+            app = SoyDi.inject(CorreoPlugin::class.java)
+            app.init()
+
+            isInitialized = true
+        }
     }
 }

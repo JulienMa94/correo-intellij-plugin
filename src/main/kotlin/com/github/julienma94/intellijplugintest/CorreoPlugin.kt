@@ -8,17 +8,9 @@ import org.correomqtt.di.Observes
 import org.correomqtt.di.SingletonBean
 
 @SingletonBean
-class CorreoPlugin {
-    private var correoCore: CorreoCore? = null
+class CorreoPlugin @Inject constructor(correoCore: CorreoCore) {
+    private var correoCore: CorreoCore? = correoCore
     private var isInitialized = false;
-
-    @Inject
-    constructor(
-            correoCore: CorreoCore,
-            guiCore: GuiCore
-    ) {
-        this.correoCore = correoCore
-    }
 
     fun init() {
         if (!isInitialized) {
