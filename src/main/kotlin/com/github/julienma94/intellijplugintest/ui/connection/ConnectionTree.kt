@@ -15,7 +15,10 @@ import org.correomqtt.di.Observes
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
@@ -33,9 +36,12 @@ class ConnectionTree(): JPanel(BorderLayout()) {
     init {
         val connections = service.getConnections();
 
-        connections.forEach {
-            val connection = DefaultMutableTreeNode(it)
-            rootNode.add(connection)
+        connections.forEach { connectionConfig ->
+
+            val connectionNode = DefaultMutableTreeNode(connectionConfig)
+            rootNode.add(connectionNode)
+            // Hier werden die spezifischen Verbindungen zu diesem Knoten hinzugefügt
+            addConnectionNodes(connectionNode, connectionConfig)
         }
 
         val decorator = ToolbarDecorator.createDecorator(tree)
@@ -147,23 +153,34 @@ class ConnectionTree(): JPanel(BorderLayout()) {
             override fun mouseClicked(e: MouseEvent) {
                 if (e.clickCount == 2) {
                     val selectedNode = tree.lastSelectedPathComponent as? DefaultMutableTreeNode
-                    if (selectedNode != null && selectedNode.isLeaf) {
-                        val nodeData = selectedNode.userObject as ConnectionConfigDTO?
-
-                        val connection = connections.find {
-                            it.name === nodeData?.name
-                        }
-
-                        if (connection != null) {
-                            service.connect(connection.id)
-                            if (nodeData != null) {
-                                project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC).onConnectionSelected(connection.name, connection.id)
-                            }
+                    if (selectedNode != null) {
+                        val nodeData = selectedNode.userObject as? ConnectionConfigDTO
+                        if (nodeData != null) {
+                            // Hier wird die spezifische Verbindung verarbeitet
+                            service.connect(nodeData.id)
+                            project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC).onConnectionSelected(nodeData.name, nodeData.id)
                         }
                     }
                 }
             }
         })
+    }
+
+    private fun addConnectionNodes(parentNode: DefaultMutableTreeNode, connectionConfig: ConnectionConfigDTO) {
+        // Hier kannst du spezifische Verbindungen hinzufügen
+        val specificConnections = getConnectionDetails(connectionConfig) // Beispiel: Fiktive Methode
+
+        specificConnections.forEach { specificConnection ->
+            val specificConnectionNode = DefaultMutableTreeNode(specificConnection)
+            parentNode.add(specificConnectionNode) // Füge den spezifischen Verbindungs-Knoten hinzu
+        }
+
+    }
+
+
+    private fun getConnectionDetails(connectionConfig: ConnectionConfigDTO): List<ConnectionConfigDTO> {
+        // Dummy-Methode zum Abrufen spezifischer Verbindungen (hier können Sie Ihre Logik hinzufügen)
+        return listOf() // Gibt eine leere Liste zurück oder relevante Verbindungen
     }
 
     fun addProject(project: Project) {
