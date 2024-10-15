@@ -1,6 +1,5 @@
 package com.github.julienma94.intellijplugintest.ui.main
 
-import com.github.julienma94.intellijplugintest.core.services.secruity.KeyringManagerService
 import com.github.julienma94.intellijplugintest.ui.common.DefaultPanel
 import com.github.julienma94.intellijplugintest.ui.connection.CONNECTION_SELECTED_TOPIC
 import com.github.julienma94.intellijplugintest.ui.connection.ConnectionSelectionListener

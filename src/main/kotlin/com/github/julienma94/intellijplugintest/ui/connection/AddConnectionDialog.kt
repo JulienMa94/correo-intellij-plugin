@@ -118,6 +118,7 @@ class AddConnectionDialog(project: Project) : DialogWrapper(project) {
         }
 
         return ConnectionConfigDTO.builder()
+            .id(UUID.randomUUID().toString())
             .name(nameField.text)
             .url(urlField.text)
             .port(portField.text.toInt())

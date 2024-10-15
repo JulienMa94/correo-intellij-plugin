@@ -1,5 +1,5 @@
 package com.github.julienma94.intellijplugintest.ui.connection
-
+import com.github.julienma94.intellijplugintest.GuiCore
 import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.components.service
@@ -12,18 +12,23 @@ import org.correomqtt.core.connection.ConnectionStateChangedEvent
 import org.correomqtt.core.model.ConnectionConfigDTO
 import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Observes
+import org.correomqtt.di.SoyDi
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 
 @DefaultBean
-class ConnectionTree(): JPanel(BorderLayout()) {
+class ConnectionTree() : JPanel(BorderLayout()) {
 
     private val service = service<ConnectionManagerService>()
+    private val settingsManager = SoyDi.inject(GuiCore::class.java).getSettingsManager()
     private val rootNode = DefaultMutableTreeNode("MQTT Connections")
     private val treeModel: DefaultTreeModel = DefaultTreeModel(rootNode)
     private val tree = Tree(treeModel).apply { isRootVisible = true }
@@ -157,7 +162,8 @@ class ConnectionTree(): JPanel(BorderLayout()) {
                         if (connection != null) {
                             service.connect(connection.id)
                             if (nodeData != null) {
-                                project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC).onConnectionSelected(connection.name, connection.id)
+                                project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC)
+                                    .onConnectionSelected(connection.name, connection.id)
                             }
                         }
                     }
@@ -179,8 +185,18 @@ class ConnectionTree(): JPanel(BorderLayout()) {
 
             println("Received new node name: $connectionDTO")
 
+            val connections = service.getConnections().toMutableList()
+            connections.add(connectionDTO)
+
+            settingsManager.saveConnections(connections, "CorreoMQTT_Plugin").run {
+
+            }
+
             rootNode.add(newNode)
             treeModel.reload(rootNode)
+
+
+
         }
     }
 

@@ -41,12 +41,6 @@
                 serviceImplementation="com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerServiceImpl"
                 id="ConnectionManager"
         />
-
-        <applicationService
-                serviceInterface="com.github.julienma94.intellijplugintest.core.services.secruity.KeyringManagerService"
-                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.secruity.KeyringManagerServiceImpl"
-                id="KeyringManager"
-        />
     </extensions>
 
     <applicationListeners>
