@@ -1,15 +1,13 @@
 package com.github.julienma94.intellijplugintest.ui.subscribe
 
 import com.github.julienma94.intellijplugintest.core.services.subscribe.SubscribeService
-import com.github.julienma94.intellijplugintest.ui.common.DefaultPanel
 import com.intellij.icons.AllIcons
-import com.intellij.ide.IdeTooltip.Ui
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.service
-import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.DumbAwareAction
-import com.intellij.util.ui.UIUtil
+import com.intellij.openapi.ui.ComboBox
+import com.intellij.ui.components.JBScrollPane
 import org.correomqtt.core.model.Qos
 import org.correomqtt.core.pubsub.IncomingMessageEvent
 import org.correomqtt.core.pubsub.SubscribeEvent
@@ -19,16 +17,18 @@ import org.correomqtt.di.Observes
 import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import javax.swing.*
 import javax.swing.border.EmptyBorder
+import kotlin.math.log
 
 @DefaultBean
 class SubscribeView {
     private val subscribeService = service<SubscribeService>()
     private val content: JPanel = JPanel(BorderLayout())
     private val messageContainer: JPanel = JPanel()
+    private val topicsPanel: JPanel = JPanel()
+    private val messagesPanel: JPanel = JPanel()
+    private val payloadPanel: JPanel = JPanel()
 
     private val messages: MutableMap<String, MutableList<IncomingMessageEvent>> = mutableMapOf()
     private val displayedTopics = mutableSetOf<String>();
@@ -36,6 +36,9 @@ class SubscribeView {
     init {
         messageContainer.layout = BoxLayout(messageContainer, BoxLayout.Y_AXIS)
         messageContainer.border = EmptyBorder(0, 0, 0, 0)
+        topicsPanel.layout = BoxLayout(topicsPanel, BoxLayout.Y_AXIS)
+        messagesPanel.layout = BoxLayout(messagesPanel, BoxLayout.Y_AXIS)
+        payloadPanel.layout = BoxLayout(payloadPanel, BoxLayout.Y_AXIS)
         updateAccordion()
     }
 
@@ -68,24 +71,36 @@ class SubscribeView {
     fun getSubscribeContent(): JPanel {
         content.layout = BorderLayout()
 
-        val rowScrollPane = JScrollPane(messageContainer)
+        val subscribeSection = getSubscribeSection()
+
+        // Layout for main content
+        val mainPanel = JPanel(GridLayout(1, 3))
+
+        topicsPanel.border = BorderFactory.createTitledBorder("Topics")
+        messagesPanel.border = BorderFactory.createTitledBorder("Messages")
+        payloadPanel.border = BorderFactory.createTitledBorder("Payload")
+
+        // Add panels to mainPanel
+        mainPanel.add(topicsPanel)
+        mainPanel.add(messagesPanel)
+        mainPanel.add(payloadPanel)
+
+        val rowScrollPane = JBScrollPane(mainPanel)
         rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
-        rowScrollPane.preferredSize = Dimension(content.width, content.height)
         rowScrollPane.border = null
 
-        content.add(getSubscribeSection(), BorderLayout.NORTH)
+        content.add(subscribeSection, BorderLayout.NORTH)
         content.add(rowScrollPane, BorderLayout.CENTER)
         return content
     }
 
     private fun getSubscribeSection(): JPanel {
-
         val subscribeSection = JPanel(BorderLayout())
 
         // Subscribe Section
         val textField = JTextField()
-        val comboBox = JComboBox(arrayOf(Qos.AT_MOST_ONCE, Qos.AT_LEAST_ONCE, Qos.EXACTLY_ONCE))
+        val comboBox = ComboBox(arrayOf(Qos.AT_MOST_ONCE, Qos.AT_LEAST_ONCE, Qos.EXACTLY_ONCE))
         comboBox.preferredSize = Dimension(20, comboBox.preferredSize.height) // Set fixed width
         comboBox.maximumSize = Dimension(20, comboBox.preferredSize.height) // Set fixed width
 
@@ -171,94 +186,46 @@ class SubscribeView {
     }
 
     private fun updateAccordion() {
-        messageContainer.removeAll() // Clear the container
+        // Populate topicsPanel with topic buttons
+        topicsPanel.removeAll()
 
-        if (messages.isEmpty()) {
-            val defaultPanel = DefaultPanel().getContent("Subscribe to a topic to see received messages")
-            messageContainer.add(defaultPanel)
-        } else {
 
-            for ((topic, messages) in messages) {
-                val topicPanel = JPanel(BorderLayout())
-                topicPanel.border = null
-
-                val isTopicDisplayed = displayedTopics.contains(topic)
-
-                if (!isTopicDisplayed) {
-                    topicPanel.preferredSize = Dimension(content.width, 50)
-                    topicPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
-                    topicPanel.minimumSize = Dimension(content.width, 50)
-                }
-
-                // Accordion Header Panel
-                val headerPanel = JPanel(BorderLayout())
-                headerPanel.border = BorderFactory.createMatteBorder(0, 0, 1, 0, UIUtil.getBoundsColor())
-                headerPanel.preferredSize = Dimension(content.width, 50)
-                headerPanel.maximumSize = Dimension(Int.MAX_VALUE, 50)
-                headerPanel.minimumSize = Dimension(content.width, 50)
-
-                val topicLabel = JLabel(topic)
-                topicLabel.font = topicLabel.font.deriveFont(Font.BOLD)
-
-                val countLabel = JLabel(messages.size.toString())
-                countLabel.border = EmptyBorder(5, 5, 5, 5)
-
-                headerPanel.add(topicLabel, BorderLayout.WEST)
-                headerPanel.add(countLabel, BorderLayout.CENTER)
-
-                topicPanel.add(headerPanel, BorderLayout.NORTH)
-
-                val messagePanel = JPanel()
-                messagePanel.layout = BoxLayout(messagePanel, BoxLayout.Y_AXIS)
-                messagePanel.isVisible = displayedTopics.contains(topic)
-
-                headerPanel.addMouseListener(object : MouseAdapter() {
-                    override fun mouseClicked(e: MouseEvent?) {
-                        messagePanel.isVisible = !messagePanel.isVisible
-                        displayedTopics.add(topic)
-
-                        topicPanel.preferredSize = null
-                        topicPanel.maximumSize = null
-                        topicPanel.minimumSize = null
-
-                        if (messagePanel.isVisible) {
-                            messagePanel.removeAll()
-                            for (msg in messages) {
-                                val messageItem = MessageItem(msg).getContent()
-                                messageItem.preferredSize = Dimension(content.width, 100)
-                                messageItem.maximumSize = Dimension(Int.MAX_VALUE, 100)
-                                messageItem.minimumSize = Dimension(content.width, 100)
-
-                                messagePanel.add(messageItem)
-                            }
-
-                        }
-
-                        content.revalidate()
-                        content.repaint()
-                    }
-                })
-
-                // Add messages to the topic message panel
-                for (msg in messages) {
-                    val messageContainer = JPanel(BorderLayout())
-                    messageContainer.border = EmptyBorder(0, 0, 0, 0)
-
-                    val messageItem = MessageItem(msg).getContent()
-                    messageItem.preferredSize = Dimension(content.width, 100)
-                    messageItem.maximumSize = Dimension(Int.MAX_VALUE, 100)
-                    messageItem.minimumSize = Dimension(content.width, 100)
-
-                    messageContainer.add(messageItem, BorderLayout.CENTER)
-                    messagePanel.add(messageContainer)
-                }
-
-                topicPanel.add(messagePanel, BorderLayout.CENTER)
-                messageContainer.add(topicPanel)
+        messages.forEach { (topic, _) ->
+            val topicButton = JButton(topic)
+            topicButton.addActionListener {
+                displayMessages(topic)
             }
+            topicsPanel.add(topicButton)
         }
 
-        messageContainer.revalidate()
-        messageContainer.repaint()
+        topicsPanel.revalidate()
+        topicsPanel.repaint()
+    }
+
+    private fun displayMessages(topic: String) {
+
+        messagesPanel.removeAll()
+        messages[topic]?.forEach { message ->
+
+            val messageButton = JButton("Message at ${message.messageDTO.dateTime}")
+            messageButton.addActionListener {
+                displayPayload(message)
+            }
+            messagesPanel.add(messageButton)
+        }
+
+        messagesPanel.revalidate()
+        messagesPanel.repaint()
+    }
+
+
+    private fun displayPayload(message: IncomingMessageEvent) {
+        payloadPanel.removeAll()
+
+        val payloadLabel = JLabel("Payload: ${message.messageDTO.payload}")
+        payloadPanel.add(payloadLabel)
+        payloadPanel.revalidate()
+        payloadPanel.repaint()
+
     }
 }
