@@ -1,6 +1,6 @@
 package com.github.julienma94.intellijplugintest
 
-import com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationServiceImpl
+import com.github.julienma94.intellijplugintest.core.services.startup.StartUpServiceImpl
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.openapi.components.service
 import com.intellij.psi.xml.XmlFile
@@ -30,7 +30,7 @@ class MyPluginTest : BasePlatformTestCase() {
     }
 
     fun testProjectService() {
-        val projectService = project.service<ApplicationActivationServiceImpl>()
+        val projectService = project.service<StartUpServiceImpl>()
 
         assertNotSame(projectService.getRandomNumber(), projectService.getRandomNumber())
     }

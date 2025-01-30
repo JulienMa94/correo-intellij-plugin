@@ -1,6 +1,6 @@
 package com.github.julienma94.intellijplugintest.core.services.publish
 
-import com.github.julienma94.intellijplugintest.GuiCore
+import com.github.julienma94.intellijplugintest.core.GuiCore
 import com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService
 import com.intellij.openapi.components.service
 import org.correomqtt.core.model.MessageDTO

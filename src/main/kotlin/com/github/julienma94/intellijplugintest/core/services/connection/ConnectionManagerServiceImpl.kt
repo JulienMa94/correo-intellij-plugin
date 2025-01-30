@@ -1,13 +1,9 @@
 package com.github.julienma94.intellijplugintest.core.services.connection
 
-import com.github.julienma94.intellijplugintest.GuiCore
+import com.github.julienma94.intellijplugintest.core.GuiCore
 import org.correomqtt.core.model.*
-import org.correomqtt.core.pubsub.PublishTaskFactory
-import org.correomqtt.core.pubsub.SubscribeTaskFactory
 import org.correomqtt.core.settings.SettingsManager
 import org.correomqtt.di.SoyDi
-import java.time.LocalDateTime
-import java.util.*
 
 class ConnectionManagerServiceImpl : ConnectionManagerService {
 

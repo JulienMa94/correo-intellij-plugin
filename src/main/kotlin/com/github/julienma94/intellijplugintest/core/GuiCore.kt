@@ -1,10 +1,8 @@
-package com.github.julienma94.intellijplugintest
+package com.github.julienma94.intellijplugintest.core
 
 import org.correomqtt.core.CoreManager
 import org.correomqtt.core.connection.ConnectionLifecycleTaskFactories
 import org.correomqtt.core.fileprovider.HistoryManager
-import org.correomqtt.core.fileprovider.SecretStoreProvider
-import org.correomqtt.core.keyring.KeyringFactory
 import org.correomqtt.core.pubsub.PublishTaskFactory
 import org.correomqtt.core.pubsub.SubscribeTaskFactory
 import org.correomqtt.core.settings.SettingsManager

@@ -1,5 +1,6 @@
 package com.github.julienma94.intellijplugintest.ui.main
 
+import com.github.julienma94.intellijplugintest.core.services.startup.StartUpService
 import com.github.julienma94.intellijplugintest.ui.common.DefaultPanel
 import com.github.julienma94.intellijplugintest.ui.connection.CONNECTION_SELECTED_TOPIC
 import com.github.julienma94.intellijplugintest.ui.connection.ConnectionSelectionListener
@@ -10,13 +11,21 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.content.ContentFactory
-import io.ktor.network.tls.*
 import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
 class MainView : ToolWindowFactory {
+
+    private val startUpService = service<StartUpService>()
+
     override fun createToolWindowContent(project: Project, toolWindow: com.intellij.openapi.wm.ToolWindow) {
+        val correoConfigBasePath = startUpService.getBaseDirectoryPath()
+
+        if (correoConfigBasePath == null || correoConfigBasePath != "${project.basePath}/.idea") {
+            startUpService.init(project.basePath!!)
+        }
+
         val myToolWindow = ToolWindow(project)
         val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(), null, false)
         toolWindow.contentManager.addContent(content)
