@@ -11,15 +11,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBScrollPane
 import org.correomqtt.core.model.Qos
-import org.correomqtt.core.pubsub.IncomingMessageEvent
 import org.correomqtt.di.DefaultBean
-import org.correomqtt.di.Observes
 import org.correomqtt.di.SoyDi
 import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.*
-import javax.swing.border.EmptyBorder
 
 @DefaultBean
 class SubscribeView {
@@ -32,24 +29,25 @@ class SubscribeView {
         val subscribeSection = getSubscribeSection()
 
         // Layout for main content
-        val mainPanel = JPanel(GridLayout(1, 3))
+        val grid = GridLayout(1, 3)
+        grid.hgap = 32
+        val mainPanel = JPanel(grid)
 
         // Add panels to mainPanel
-
-        var messageListView = SoyDi.inject(MessageListView::class.java)
+        val messageListView = SoyDi.inject(MessageListView::class.java)
         messageListView.addProject(project)
 
         mainPanel.add(SoyDi.inject(TopicListView::class.java))
         mainPanel.add(messageListView)
         mainPanel.add(PayloadArea().createJsonTextArea())
 
-        val rowScrollPane = JBScrollPane(mainPanel)
-        rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
-        rowScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
-        rowScrollPane.border = null
+        val mainScrollPane = JBScrollPane(mainPanel)
+        mainScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+        mainScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        mainScrollPane.border = null
 
         content.add(subscribeSection, BorderLayout.NORTH)
-        content.add(rowScrollPane, BorderLayout.CENTER)
+        content.add(mainScrollPane, BorderLayout.CENTER)
         return content
     }
 
