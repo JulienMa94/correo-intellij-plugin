@@ -10,6 +10,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
+//TODO Must be refactored to new figma design
 class MessageItem(message: IncomingMessageEvent) {
     private val row = JPanel(BorderLayout())
 

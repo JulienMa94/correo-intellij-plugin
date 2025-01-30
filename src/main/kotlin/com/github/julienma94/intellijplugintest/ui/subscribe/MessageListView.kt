@@ -17,17 +17,24 @@ import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.JOptionPane
 import javax.swing.JPanel
+import javax.swing.ListCellRenderer
 import javax.swing.ListSelectionModel
 
 @DefaultBean
 class MessageListView() : JPanel(BorderLayout()) {
 
-    private val listModel = DefaultListModel<String>()
+    private val listModel = DefaultListModel<IncomingMessageEvent>()
     private val jbList = JBList(listModel)
     private var project: Project? = null
 
     init {
         jbList.selectionMode = ListSelectionModel.SINGLE_SELECTION
+
+        jbList.cellRenderer = ListCellRenderer<IncomingMessageEvent> { list, value, index, isSelected, cellHasFocus ->
+            val messageItem = MessageItem(value)
+            messageItem.getContent()
+        }
+
         jbList.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (e.clickCount == 2) {  // Double-click action
@@ -65,6 +72,6 @@ class MessageListView() : JPanel(BorderLayout()) {
 
     fun incomingMessageEvent(@Observes event: IncomingMessageEvent) {
         println("Received incoming message event for topic ${event.messageDTO.topic}")
-        listModel.addElement(event.messageDTO.payload)
+        listModel.addElement(event)
     }
 }
