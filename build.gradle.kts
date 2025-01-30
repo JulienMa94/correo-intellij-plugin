@@ -33,8 +33,8 @@ kapt {
 dependencies {
     kapt("org.correomqtt:di:0.15.0")
 
-    implementation("org.correomqtt:di:0.15.0")
-    implementation("org.correomqtt:core:0.15.0")
+    implementation("org.correomqtt:di:1.0-SNAPSHOT")
+    implementation("org.correomqtt:core:1.0-SNAPSHOT")
     implementation("com.fifesoft:rsyntaxtextarea:3.4.1")
     implementation("com.fifesoft:autocomplete:3.3.1")
     implementation("org.json:json:20210307")  // For JSON validation

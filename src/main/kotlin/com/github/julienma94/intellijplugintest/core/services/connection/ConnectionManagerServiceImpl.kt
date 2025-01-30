@@ -2,20 +2,24 @@ package com.github.julienma94.intellijplugintest.core.services.connection
 
 import com.github.julienma94.intellijplugintest.GuiCore
 import org.correomqtt.core.model.*
-import org.correomqtt.core.pubsub.PublishTaskFactory
-import org.correomqtt.core.pubsub.SubscribeTaskFactory
 import org.correomqtt.core.settings.SettingsManager
 import org.correomqtt.di.SoyDi
-import java.time.LocalDateTime
 import java.util.*
 
+/**
+ * Service which manages the MQTT connection lifecycle.
+ */
 class ConnectionManagerServiceImpl : ConnectionManagerService {
 
     private val guiCore: GuiCore = SoyDi.inject(GuiCore::class.java)
 
     private val settingsManager: SettingsManager = guiCore.getSettingsManager()
 
-    private val tabIndexToConnectionId = mutableMapOf<Int, String>()
+    /**
+     * Holds all active connections to their list index.
+     * If the user switches between connections, the connectionId is stored or retrieved from this map.
+     */
+    private val listIndexToConnectionId = mutableMapOf<Int, String>()
 
     private lateinit var activeConnectionId: String;
 
@@ -23,43 +27,75 @@ class ConnectionManagerServiceImpl : ConnectionManagerService {
         return settingsManager.connectionConfigs
     }
 
-    override fun connect(connectionId: String) {
+    /**
+     * Calls the correo backend connect task for the given connectionId.
+     * If the connection was successful, the connectionId is set as the active connection.
+     * @param connectionData The connection data.
+     * @param index The index of the connection in the connection list.
+     */
+    override fun connect(connectionData: ConnectionConfigDTO, index: Int) {
+        val connectionId = connectionData.id
+        val name = connectionData.name
+
+        if (listIndexToConnectionId.containsKey(index)) {
+            println("Connection already established for the selected broker")
+            setActiveConnectionId(listIndexToConnectionId[index]!!)
+            return
+        }
+
         guiCore.getConnectionLifecycleTaskFactory()
                 .connectFactory
                 .create(connectionId)
                 .onSuccess {
-                    println("Successfully connected to $connectionId");
+                    listIndexToConnectionId[index] = connectionId
+                    println("Successfully connected to $name, $connectionId");
+                    setActiveConnectionId(connectionId)
                 }
                 .onError {
-                    println("Error while connecting to $connectionId")
+                    println("Error while connecting to $name, $connectionId")
+                    setActiveConnectionId("")
                 }
                 .run()
     }
 
-    override fun disconnect(tabIndex: Int) {
-        val connectionId = tabIndexToConnectionId[tabIndex] ?: return
+    /**
+     * Switches the active connection to the connectionId when the user previously connected to it.
+     * @param connectionId The connectionId to switch to.
+     */
+    override fun switch(connectionData: ConnectionConfigDTO): Boolean {
+        val id = connectionData.id
+        val name = connectionData.name
 
+        if (listIndexToConnectionId.containsValue(id)) {
+            println("Switching to $name, $id")
+            setActiveConnectionId(id)
+            return true;
+        } else {
+            println("Connection not established for $name, $id")
+            return false;
+        }
+    }
+
+    /**
+     * Calls the correo backend disconnect task.
+     * @param tabIndex The tabIndex of the connection to disconnect from.
+     */
+    override fun disconnect() {
         guiCore.getConnectionLifecycleTaskFactory()
                 .disconnectFactory
-                .create(connectionId)
+                .create(this.activeConnectionId)
                 .onSuccess {
-                    println("Successfully disconnected for $connectionId");
+                    setActiveConnectionId("")
+                    println("Successfully disconnected for ${this.activeConnectionId}");
                 }
                 .onError {
-                    println("Error while disconnecting from $connectionId")
+                    println("Error while disconnecting from ${this.activeConnectionId}")
                 }
                 .run()
-    }
-
-    override fun addConnectionId(tabIndex: Int, connectionId: String) {
-        tabIndexToConnectionId[tabIndex] = connectionId
-    }
-
-    override fun removeConnectionId(tabIndex: Int) {
-        tabIndexToConnectionId.remove(tabIndex)
     }
 
     override fun setActiveConnectionId(connectionId: String) {
+        println("Setting active connection to $connectionId")
         activeConnectionId = connectionId
     }
 

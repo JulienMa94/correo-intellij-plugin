@@ -24,7 +24,7 @@ import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 
 @DefaultBean
-class ConnectionTree(): JPanel(BorderLayout()) {
+class ConnectionTree() : JPanel(BorderLayout()) {
 
     private val service = service<ConnectionManagerService>()
     private val rootNode = DefaultMutableTreeNode("MQTT Connections")
@@ -148,7 +148,9 @@ class ConnectionTree(): JPanel(BorderLayout()) {
             }
         }
 
-        // Add mouse listener to handle double-clicks
+        /**
+         * Double click listener. Triggers a connection to the selected connection.
+         */
         tree.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (e.clickCount == 2) {
@@ -157,8 +159,24 @@ class ConnectionTree(): JPanel(BorderLayout()) {
                         val nodeData = selectedNode.userObject as? ConnectionConfigDTO
                         if (nodeData != null) {
                             // Hier wird die spezifische Verbindung verarbeitet
-                            service.connect(nodeData.id)
-                            project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC).onConnectionSelected(nodeData.name, nodeData.id)
+                            service.connect(nodeData, tree.getRowForPath(tree.selectionPath))
+                            project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC)
+                                .onConnectionSelected(nodeData.name, nodeData.id)
+                        }
+                    }
+                }
+
+                if (e.clickCount == 1) {
+                    val selectedNode = tree.lastSelectedPathComponent as? DefaultMutableTreeNode
+                    if (selectedNode != null) {
+                        val nodeData = selectedNode.userObject as? ConnectionConfigDTO
+                        if (nodeData != null) {
+                            val isConnected = service.switch(nodeData)
+
+                            if (isConnected) {
+                                project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC)
+                                    .onConnectionSelected(nodeData.name, nodeData.id)
+                            }
                         }
                     }
                 }
