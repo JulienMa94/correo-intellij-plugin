@@ -26,7 +26,7 @@ class MainView : ToolWindowFactory {
         private val content: JPanel = JPanel(BorderLayout())
         private val splitter: JBSplitter = JBSplitter(false, 0.12f)
         private val connectionTree: ConnectionTree = SoyDi.inject(ConnectionTree::class.java)
-        private val tabManager: TabManager = TabManager()
+        private val tabManager: TabManager = TabManager(project)
 
         init {
             connectionTree.addProject(project)

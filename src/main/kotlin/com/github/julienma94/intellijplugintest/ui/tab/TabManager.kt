@@ -2,13 +2,14 @@ package com.github.julienma94.intellijplugintest.ui.tab
 
 import com.github.julienma94.intellijplugintest.ui.publish.PublishView
 import com.github.julienma94.intellijplugintest.ui.subscribe.SubscribeView
+import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTabbedPane
 import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class TabManager() {
+class TabManager(var project: Project) {
     private val tabbedPane = JBTabbedPane()
 
     init {
@@ -24,7 +25,7 @@ class TabManager() {
     private fun createFixedTabs() {
 
         // Create the "Subscribe" tab
-        val subscribeContent = SoyDi.inject(SubscribeView::class.java).getSubscribeContent()
+        val subscribeContent = SoyDi.inject(SubscribeView::class.java).getSubscribeContent(project)
         tabbedPane.addTab("Subscribe", createTabContent(subscribeContent))
 
         // Create the "Publish" tab

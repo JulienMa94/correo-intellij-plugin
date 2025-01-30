@@ -16,6 +16,7 @@ class ApplicationActivationServiceImpl : ApplicationActivationService {
             thisLogger().info(MyBundle.message("start"))
             SoyDi.scan("org.correomqtt")
             SoyDi.scan("com.github.julienma94");
+            SoyDi.scan("com.intellij.openapi.project")
             app = SoyDi.inject(CorreoPlugin::class.java)
             app.init()
 

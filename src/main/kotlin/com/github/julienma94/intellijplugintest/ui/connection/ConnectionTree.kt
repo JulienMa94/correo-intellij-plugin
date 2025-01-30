@@ -22,6 +22,7 @@ import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.TreePath
 
 @DefaultBean
 class ConnectionTree() : JPanel(BorderLayout()) {
@@ -43,6 +44,11 @@ class ConnectionTree() : JPanel(BorderLayout()) {
             // Hier werden die spezifischen Verbindungen zu diesem Knoten hinzugefügt
             addConnectionNodes(connectionNode, connectionConfig)
         }
+
+        if (rootNode.childCount > 0) {
+            tree.expandPath(TreePath(rootNode.path))
+        }
+
 
         val decorator = ToolbarDecorator.createDecorator(tree)
             .setAddAction { addNode() }
@@ -231,6 +237,9 @@ class ConnectionTree() : JPanel(BorderLayout()) {
         }
     }
 
+    /**
+     * Observes connection state changes and updates the tree item state accordingly.
+     */
     fun onConnectionStateChanged(@Observes event: ConnectionStateChangedEvent) {
         println("Received connection state change event ${event.state}")
         connectionStateMap[event.connectionId] = event.state
