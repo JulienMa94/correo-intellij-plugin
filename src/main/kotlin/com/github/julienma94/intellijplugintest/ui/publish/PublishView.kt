@@ -28,7 +28,7 @@ class PublishView {
         rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.preferredSize = Dimension(content.width, content.height)
-        rowScrollPane.border = EmptyBorder(8, 2, 8, 2)
+        rowScrollPane.border = EmptyBorder(16, 0, 16, 0)
 
         val topicTextField = JTextField()
         topicTextField.preferredSize = Dimension(350, topicTextField.preferredSize.height) // Set fixed width

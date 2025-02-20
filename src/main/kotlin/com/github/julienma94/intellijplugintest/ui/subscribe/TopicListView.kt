@@ -9,11 +9,7 @@ import org.correomqtt.di.Observes
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.BorderFactory
-import javax.swing.DefaultListModel
-import javax.swing.JOptionPane
-import javax.swing.JPanel
-import javax.swing.ListSelectionModel
+import javax.swing.*
 
 @DefaultBean
 class TopicListView() : JPanel(BorderLayout()) {
@@ -23,6 +19,7 @@ class TopicListView() : JPanel(BorderLayout()) {
 
     init {
         jbList.selectionMode = ListSelectionModel.SINGLE_SELECTION
+        jbList.cellRenderer = TopicListRenderer()
         jbList.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (e.clickCount == 2) {  // Double-click action

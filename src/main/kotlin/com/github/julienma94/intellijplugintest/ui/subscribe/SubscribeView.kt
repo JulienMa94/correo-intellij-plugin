@@ -17,7 +17,9 @@ import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.*
+import javax.swing.border.EmptyBorder
 
+//TODO Extract subscribe toolbar from this class
 @DefaultBean
 class SubscribeView {
     private val subscribeService = service<SubscribeService>()
@@ -25,28 +27,45 @@ class SubscribeView {
 
     fun getSubscribeContent(project: Project): JPanel {
         content.layout = BorderLayout()
-
         val subscribeSection = getSubscribeSection()
 
         // Layout for main content
-        val grid = GridLayout(1, 3)
-        grid.hgap = 32
-        val mainPanel = JPanel(grid)
+        val mainPanel = JPanel(GridBagLayout())
+        val constraints = GridBagConstraints()
 
         // Add panels to mainPanel
         val messageListView = SoyDi.inject(MessageListView::class.java)
         messageListView.addProject(project)
 
-        mainPanel.add(SoyDi.inject(TopicListView::class.java))
-        mainPanel.add(messageListView)
-        mainPanel.add(PayloadArea().createJsonTextArea())
+
+        constraints.gridx = 0
+        constraints.weightx = 0.1
+        constraints.weighty = 1.0
+        constraints.fill = GridBagConstraints.BOTH
+        constraints.insets = Insets(0, 0, 0, 8)
+        mainPanel.add(SoyDi.inject(TopicListView::class.java), constraints)
+
+        constraints.gridx = 1
+        constraints.weightx = 0.1
+        constraints.weighty = 1.0
+        mainPanel.add(messageListView, constraints)
+
+        constraints.gridx = 2
+        constraints.weightx = 1.0
+        constraints.weighty = 1.0
+        mainPanel.add(PayloadArea().createJsonTextArea(), constraints)
 
         val mainScrollPane = JBScrollPane(mainPanel)
         mainScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         mainScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
-        mainScrollPane.border = null
+        mainScrollPane.border = EmptyBorder(16, 0, 0, 0)
 
-        content.add(subscribeSection, BorderLayout.NORTH)
+        val wrapperPanel = JPanel(BorderLayout()).apply {
+            border = EmptyBorder(16, 0, 16, 0)
+            add(subscribeSection, BorderLayout.WEST)
+        }
+
+        content.add(wrapperPanel, BorderLayout.NORTH)
         content.add(mainScrollPane, BorderLayout.CENTER)
         return content
     }
@@ -56,9 +75,10 @@ class SubscribeView {
 
         // Subscribe Section
         val textField = JTextField()
+        textField.preferredSize = Dimension(400, textField.preferredSize.height) // Set fixed width
         val comboBox = ComboBox(arrayOf(Qos.AT_MOST_ONCE, Qos.AT_LEAST_ONCE, Qos.EXACTLY_ONCE))
-        comboBox.preferredSize = Dimension(20, comboBox.preferredSize.height) // Set fixed width
-        comboBox.maximumSize = Dimension(20, comboBox.preferredSize.height) // Set fixed width
+        comboBox.preferredSize = Dimension(100, comboBox.preferredSize.height) // Set fixed width
+        comboBox.maximumSize = Dimension(100, comboBox.preferredSize.height) // Set fixed width
 
         val subscribeAction = object : DumbAwareAction(
             "Subscribing to ${textField.text}",
@@ -71,6 +91,7 @@ class SubscribeView {
             }
         }
         val subscribeButton = JButton("Subscribe")
+        subscribeButton.preferredSize = Dimension(100, subscribeButton.preferredSize.height) // Set fixed width
         subscribeButton.addActionListener {
             subscribeAction.actionPerformed(
                 AnActionEvent.createFromAnAction(
@@ -119,17 +140,11 @@ class SubscribeView {
         val panel = JPanel(gridBagLayout)
 
         // Add the JTextField to the panel
-        constraints.weightx = 0.7
-        constraints.fill = GridBagConstraints.HORIZONTAL
         constraints.gridx = 0
         panel.add(textField, constraints)
-
         constraints.gridx = 1
-        constraints.weightx = 0.1
         panel.add(comboBox, constraints)
-
         constraints.gridx = 2
-        constraints.weightx = 0.2
         panel.add(subscribeButton, constraints)
 
         subscribeSection.add(panel, BorderLayout.NORTH)

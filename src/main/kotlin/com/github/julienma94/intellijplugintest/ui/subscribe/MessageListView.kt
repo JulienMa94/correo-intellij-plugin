@@ -5,21 +5,16 @@ import com.github.julienma94.intellijplugintest.ui.connection.ConnectionSelectio
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.util.ui.UIUtil
 import org.correomqtt.core.pubsub.IncomingMessageEvent
-import org.correomqtt.core.pubsub.SubscribeEvent
-import org.correomqtt.core.pubsub.UnsubscribeEvent
 import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Observes
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.BorderFactory
-import javax.swing.DefaultListModel
-import javax.swing.JOptionPane
-import javax.swing.JPanel
-import javax.swing.ListCellRenderer
-import javax.swing.ListSelectionModel
+import javax.swing.*
 
+//TODO: Add message listener click to select message and display in message detail view
 @DefaultBean
 class MessageListView() : JPanel(BorderLayout()) {
 
@@ -31,8 +26,9 @@ class MessageListView() : JPanel(BorderLayout()) {
         jbList.selectionMode = ListSelectionModel.SINGLE_SELECTION
 
         jbList.cellRenderer = ListCellRenderer<IncomingMessageEvent> { list, value, index, isSelected, cellHasFocus ->
-            val messageItem = MessageItem(value)
-            messageItem.getContent()
+            isOpaque = true;
+            val messageItem = MessageItem(value, isSelected)
+            messageItem.getContent();
         }
 
         jbList.addMouseListener(object : MouseAdapter() {
@@ -55,9 +51,9 @@ class MessageListView() : JPanel(BorderLayout()) {
     }
 
     fun addProject(project: Project) {
-       if (this.project == null) {
-           this.project.apply {
-               this@MessageListView.project = project
+        if (this.project == null) {
+            this.project.apply {
+                this@MessageListView.project = project
 
                 val connection = project.messageBus.connect();
 
@@ -66,8 +62,8 @@ class MessageListView() : JPanel(BorderLayout()) {
                         println("Connection selected received in message list view: $name, $id")
                     }
                 })
-           }
-       }
+            }
+        }
     }
 
     fun incomingMessageEvent(@Observes event: IncomingMessageEvent) {
