@@ -1,5 +1,6 @@
 package com.correomqtt.intellij.ui.common
 
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import java.awt.BorderLayout
 import java.awt.Color
@@ -12,28 +13,18 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class Row(isSelected: Boolean) {
-
-    private val row = JPanel(BorderLayout())
-
+open class Row(isSelected: Boolean): JPanel(BorderLayout()) {
     init {
         if (isSelected) {
-            row.background = UIUtil.getListSelectionBackground(true) // Theme-aware selection color
-            row.foreground = UIUtil.getListSelectionForeground(true) // Theme-aware selection text color
+            background = UIUtil.getListSelectionBackground(true) // Theme-aware selection color
+            foreground = UIUtil.getListSelectionForeground(true) // Theme-aware selection text color
         } else {
-            row.background = UIUtil.getListBackground() // Default background color
-            row.foreground = UIUtil.getListForeground() // Default text color
+            background = UIUtil.getListBackground() // Default background color
+            foreground = UIUtil.getListForeground() // Default text color
         }
 
-        row.preferredSize = Dimension(0, 48)
-        row.border = EmptyBorder(8, 16, 8, 16)
-    }
-
-    fun addComponent(component: JComponent, constraints: Any) {
-        row.add(component, constraints)
-    }
-
-    fun getContent(): JPanel {
-        return row
+        minimumSize = Dimension(0, 48)
+        maximumSize = Dimension(Int.MAX_VALUE, 48)
+        border = JBUI.Borders.empty(8, 16)
     }
 }

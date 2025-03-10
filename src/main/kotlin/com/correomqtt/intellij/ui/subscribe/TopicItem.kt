@@ -2,16 +2,16 @@ package com.correomqtt.intellij.ui.subscribe
 
 import com.correomqtt.intellij.ui.common.Row
 import com.intellij.icons.AllIcons
-import com.intellij.util.ui.UIUtil
-import org.correomqtt.core.pubsub.IncomingMessageEvent
-import java.awt.*
-import java.awt.image.BufferedImage
-import javax.swing.*
-import javax.swing.border.EmptyBorder
+import java.awt.BorderLayout
+import java.awt.Dimension
+import java.awt.FlowLayout
+import javax.accessibility.AccessibleContext
+import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JPanel
 
 //TODO Add qos to topic item
-class TopicItem(topic: String, isSelected: Boolean) {
-    private val row = Row(isSelected)
+class TopicItem(topic: String, isSelected: Boolean) : Row(isSelected) {
 
     init {
         val unsubscribeButton = JButton(AllIcons.Actions.Close).apply {
@@ -22,14 +22,23 @@ class TopicItem(topic: String, isSelected: Boolean) {
             preferredSize = Dimension(16, 16)
         }
 
-        row.addComponent(JLabel(topic), BorderLayout.WEST)
-        row.addComponent(JLabel("Qos 0"), BorderLayout.CENTER)
-        row.addComponent(unsubscribeButton, BorderLayout.EAST)
+        // Create a container panel for the WEST side to hold both placeholderLabel and payload
+        val eastPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 16, 0)) // Adds horizontal gap of 16px between components
+        eastPanel.isOpaque = false // Make sure the panel is transparent to show background
+
+        // Ensure the westPanel takes up the full height of the Row, for vertical centering
+        eastPanel.minimumSize = Dimension(0, 48)
+        eastPanel.maximumSize = Dimension(Int.MAX_VALUE, 48)
+
+        // Add the placeholder label and payload label to the west panel
+        eastPanel.add(JLabel("Qos 0"))
+        eastPanel.add(unsubscribeButton)
+
+        add(JLabel(topic), BorderLayout.WEST)
+        add(eastPanel, BorderLayout.EAST)
     }
 
-
-
-    fun getContent(): JPanel {
-        return row.getContent()
+    override fun getAccessibleContext(): AccessibleContext {
+        return super.getAccessibleContext()
     }
 }

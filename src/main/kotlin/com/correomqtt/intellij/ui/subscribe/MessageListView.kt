@@ -24,10 +24,9 @@ class MessageListView() : JPanel(BorderLayout()) {
     init {
         jbList.selectionMode = ListSelectionModel.SINGLE_SELECTION
 
-        jbList.cellRenderer = ListCellRenderer<IncomingMessageEvent> { list, value, index, isSelected, cellHasFocus ->
+        jbList.cellRenderer = ListCellRenderer<IncomingMessageEvent> { _, value, _, isSelected, _ ->
             isOpaque = true;
-            val messageItem = MessageItem(value, isSelected)
-            messageItem.getContent();
+            MessageItem(value, isSelected)
         }
 
         jbList.addMouseListener(object : MouseAdapter() {
