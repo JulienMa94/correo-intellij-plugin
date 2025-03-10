@@ -2,9 +2,7 @@ package com.correomqtt.intellij
 
 import com.intellij.openapi.diagnostic.thisLogger
 import org.correomqtt.core.CorreoCore
-import org.correomqtt.core.pubsub.IncomingMessageEvent
 import org.correomqtt.di.Inject
-import org.correomqtt.di.Observes
 import org.correomqtt.di.SingletonBean
 
 @SingletonBean

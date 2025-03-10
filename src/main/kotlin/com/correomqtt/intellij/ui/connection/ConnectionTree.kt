@@ -10,7 +10,9 @@ import com.intellij.util.ui.UIUtil
 import org.correomqtt.core.connection.ConnectionState
 import org.correomqtt.core.connection.ConnectionStateChangedEvent
 import org.correomqtt.core.model.ConnectionConfigDTO
+import org.correomqtt.di.Assisted
 import org.correomqtt.di.DefaultBean
+import org.correomqtt.di.Inject
 import org.correomqtt.di.Observes
 import java.awt.*
 import java.awt.event.MouseAdapter
@@ -25,8 +27,7 @@ import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
 
 @DefaultBean
-class ConnectionTree() : JPanel(BorderLayout()) {
-
+class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLayout()) {
     private val service = service<ConnectionManagerService>()
     private val rootNode = DefaultMutableTreeNode("MQTT Connections")
     private val treeModel: DefaultTreeModel = DefaultTreeModel(rootNode)

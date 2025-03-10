@@ -1,31 +1,24 @@
 package com.correomqtt.intellij.ui.tab
 
 import com.correomqtt.intellij.ui.publish.PublishView
-import com.correomqtt.intellij.ui.subscribe.SubscribeView
+import com.correomqtt.intellij.ui.subscribe.SubscribeViewFactory
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTabbedPane
-import org.correomqtt.di.SoyDi
+import com.intellij.util.ui.JBUI
+import org.correomqtt.di.Assisted
+import org.correomqtt.di.DefaultBean
+import org.correomqtt.di.Inject
 import java.awt.BorderLayout
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
-class TabManager(var project: Project) {
+@DefaultBean
+class TabManager @Inject constructor(@Assisted var project: Project) {
     private val tabbedPane = JBTabbedPane()
 
     init {
-        createFixedTabs()
-    }
-
-
-    fun getTabbedPane(): JBTabbedPane {
-        return tabbedPane
-    }
-
-
-    private fun createFixedTabs() {
-
         // Create the "Subscribe" tab
-        val subscribeContent = SoyDi.inject(SubscribeView::class.java).getSubscribeContent(project)
+        val subscriptionViewFactory = SubscribeViewFactory()
+        val subscribeContent = subscriptionViewFactory.create(project)
         tabbedPane.addTab("Subscribe", createTabContent(subscribeContent))
 
         // Create the "Publish" tab
@@ -33,10 +26,13 @@ class TabManager(var project: Project) {
         tabbedPane.addTab("Publish", createTabContent(publishContent))
     }
 
+    fun getTabbedPane(): JBTabbedPane {
+        return tabbedPane
+    }
 
     private fun createTabContent(content: JPanel): JPanel {
         val root = JPanel(BorderLayout())
-        root.border = EmptyBorder(8, 16, 8, 16)
+        root.border = JBUI.Borders.empty(8, 16)
 
         // Wrap the provided content in a JBSplitter if needed (comment/uncomment depending on your needs)
         // val splitter = JBSplitter(false, 0.5f)
@@ -45,6 +41,5 @@ class TabManager(var project: Project) {
 
         root.add(content, BorderLayout.CENTER)
         return root
-
     }
 }

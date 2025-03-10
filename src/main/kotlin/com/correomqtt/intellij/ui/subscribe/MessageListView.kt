@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import org.correomqtt.core.pubsub.IncomingMessageEvent
+import org.correomqtt.di.Assisted
 import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Observes
 import java.awt.BorderLayout
@@ -15,13 +16,19 @@ import javax.swing.*
 
 //TODO: Add message listener click to select message and display in message detail view
 @DefaultBean
-class MessageListView() : JPanel(BorderLayout()) {
-
+class MessageListView constructor (@Assisted project: Project) : JPanel(BorderLayout()) {
     private val listModel = DefaultListModel<IncomingMessageEvent>()
     private val jbList = JBList(listModel)
-    private var project: Project? = null
 
     init {
+        val connection = project.messageBus.connect();
+
+        connection.subscribe(CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
+            override fun onConnectionSelected(name: String, id: String) {
+                println("Connection selected received in message list view: $name, $id")
+            }
+        })
+
         jbList.selectionMode = ListSelectionModel.SINGLE_SELECTION
 
         jbList.cellRenderer = ListCellRenderer<IncomingMessageEvent> { _, value, _, isSelected, _ ->
@@ -46,22 +53,6 @@ class MessageListView() : JPanel(BorderLayout()) {
             border = BorderFactory.createEmptyBorder()
         }
         add(scrollPane, BorderLayout.CENTER)
-    }
-
-    fun addProject(project: Project) {
-        if (this.project == null) {
-            this.project.apply {
-                this@MessageListView.project = project
-
-                val connection = project.messageBus.connect();
-
-                connection.subscribe(CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
-                    override fun onConnectionSelected(name: String, id: String) {
-                        println("Connection selected received in message list view: $name, $id")
-                    }
-                })
-            }
-        }
     }
 
     fun incomingMessageEvent(@Observes event: IncomingMessageEvent) {

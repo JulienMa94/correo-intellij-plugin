@@ -10,23 +10,29 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.util.ui.JBUI
 import org.correomqtt.core.model.Qos
+import org.correomqtt.di.Assisted
 import org.correomqtt.di.DefaultBean
+import org.correomqtt.di.Inject
 import org.correomqtt.di.SoyDi
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Dimension
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import javax.swing.*
-import javax.swing.border.EmptyBorder
+import javax.swing.JButton
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextField
 
 //TODO Extract subscribe toolbar from this class
 @DefaultBean
-class SubscribeView {
+class SubscribeView @Inject constructor(@Assisted project: Project) : JPanel(BorderLayout()) {
     private val subscribeService = service<SubscribeService>()
-    private val content: JPanel = JPanel(BorderLayout())
 
-    fun getSubscribeContent(project: Project): JPanel {
-        content.layout = BorderLayout()
+    init {
         val subscribeSection = getSubscribeSection()
 
         // Layout for main content
@@ -34,15 +40,14 @@ class SubscribeView {
         val constraints = GridBagConstraints()
 
         // Add panels to mainPanel
-        val messageListView = SoyDi.inject(MessageListView::class.java)
-        messageListView.addProject(project)
-
+        val messageListViewFactory = MessageListViewFactory()
+        val messageListView = messageListViewFactory.create(project)
 
         constraints.gridx = 0
         constraints.weightx = 0.2
         constraints.weighty = 1.0
         constraints.fill = GridBagConstraints.BOTH
-        constraints.insets = Insets(0, 0, 0, 8)
+        constraints.insets = JBUI.insetsRight(8)
         mainPanel.add(SoyDi.inject(TopicListView::class.java), constraints)
 
         constraints.gridx = 1
@@ -58,17 +63,17 @@ class SubscribeView {
         val mainScrollPane = JBScrollPane(mainPanel)
         mainScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         mainScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
-        mainScrollPane.border = EmptyBorder(16, 0, 0, 0)
+        mainScrollPane.border = JBUI.Borders.emptyTop(16)
 
         val wrapperPanel = JPanel(BorderLayout()).apply {
-            border = EmptyBorder(16, 0, 16, 0)
+            border = JBUI.Borders.empty(16, 0)
             add(subscribeSection, BorderLayout.WEST)
         }
 
-        content.add(wrapperPanel, BorderLayout.NORTH)
-        content.add(mainScrollPane, BorderLayout.CENTER)
-        return content
+        add(wrapperPanel, BorderLayout.NORTH)
+        add(mainScrollPane, BorderLayout.CENTER)
     }
+
 
     private fun getSubscribeSection(): JPanel {
         val subscribeSection = JPanel(BorderLayout())
