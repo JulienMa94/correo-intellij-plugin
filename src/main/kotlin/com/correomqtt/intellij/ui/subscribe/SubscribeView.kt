@@ -39,19 +39,19 @@ class SubscribeView {
 
 
         constraints.gridx = 0
-        constraints.weightx = 0.1
+        constraints.weightx = 0.2
         constraints.weighty = 1.0
         constraints.fill = GridBagConstraints.BOTH
         constraints.insets = Insets(0, 0, 0, 8)
         mainPanel.add(SoyDi.inject(TopicListView::class.java), constraints)
 
         constraints.gridx = 1
-        constraints.weightx = 0.1
+        constraints.weightx = 0.2
         constraints.weighty = 1.0
         mainPanel.add(messageListView, constraints)
 
         constraints.gridx = 2
-        constraints.weightx = 1.0
+        constraints.weightx = 0.6
         constraints.weighty = 1.0
         mainPanel.add(PayloadArea().createJsonTextArea(), constraints)
 
