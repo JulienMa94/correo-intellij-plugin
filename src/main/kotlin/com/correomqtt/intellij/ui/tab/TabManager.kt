@@ -10,24 +10,18 @@ import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Inject
 import java.awt.BorderLayout
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
 
 @DefaultBean
-class TabManager @Inject constructor(@Assisted var project: Project) {
-    private val tabbedPane = JBTabbedPane()
-
+class TabManager @Inject constructor(@Assisted var project: Project): JTabbedPane() {
     init {
         // Create the "Subscribe" tab
-        val subscriptionViewFactory = SubscribeViewFactory()
-        val subscribeContent = subscriptionViewFactory.create(project)
-        tabbedPane.addTab("Subscribe", createTabContent(subscribeContent))
+        val subscribeContent = SubscribeViewFactory().create(project)
+        addTab("Subscribe", createTabContent(subscribeContent))
 
         // Create the "Publish" tab
         val publishContent = PublishView().getPublishContent()
-        tabbedPane.addTab("Publish", createTabContent(publishContent))
-    }
-
-    fun getTabbedPane(): JBTabbedPane {
-        return tabbedPane
+        addTab("Publish", createTabContent(publishContent))
     }
 
     private fun createTabContent(content: JPanel): JPanel {

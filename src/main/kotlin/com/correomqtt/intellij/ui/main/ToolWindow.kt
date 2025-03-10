@@ -28,15 +28,14 @@ class ToolWindow @Inject constructor(@Assisted project: Project): JPanel(BorderL
         connection.subscribe(CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
             override fun onConnectionSelected(name: String, id: String) {
                 println("Connection selected: $name, $id")
-                tabManager.getTabbedPane()
-                splitter.secondComponent = tabManager.getTabbedPane()
+                splitter.secondComponent = tabManager
 
                 revalidate()
                 repaint()
             }
         })
         splitter.firstComponent = connectionTree
-        splitter.secondComponent = DefaultPanel().getContent("No connection selected")
+        splitter.secondComponent = DefaultPanel("No connection selected")
 
         splitter.secondComponent.border = null
         add(splitter, BorderLayout.CENTER)

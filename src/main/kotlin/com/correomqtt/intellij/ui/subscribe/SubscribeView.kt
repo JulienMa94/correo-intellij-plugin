@@ -15,7 +15,6 @@ import org.correomqtt.core.model.Qos
 import org.correomqtt.di.Assisted
 import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Inject
-import org.correomqtt.di.SoyDi
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.GridBagConstraints
@@ -29,7 +28,7 @@ import javax.swing.JTextField
 
 //TODO Extract subscribe toolbar from this class
 @DefaultBean
-class SubscribeView @Inject constructor(@Assisted project: Project) : JPanel(BorderLayout()) {
+class SubscribeView @Inject constructor(@Assisted project: Project, topicListView: TopicListView) : JPanel(BorderLayout()) {
     private val subscribeService = service<SubscribeService>()
 
     init {
@@ -48,7 +47,7 @@ class SubscribeView @Inject constructor(@Assisted project: Project) : JPanel(Bor
         constraints.weighty = 1.0
         constraints.fill = GridBagConstraints.BOTH
         constraints.insets = JBUI.insetsRight(8)
-        mainPanel.add(SoyDi.inject(TopicListView::class.java), constraints)
+        mainPanel.add(topicListView, constraints)
 
         constraints.gridx = 1
         constraints.weightx = 0.2
