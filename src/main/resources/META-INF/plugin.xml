@@ -1,8 +1,8 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.julienma94.intellijplugintest</id>
-    <name>intellij-plugin-test Template</name>
-    <vendor>Julien Marcq</vendor>
+    <id>com.correomqtt.intellij</id>
+    <name>Correo mqtt plugin</name>
+    <vendor>PlaceHolder</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
@@ -10,47 +10,47 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Correo" anchor="bottom" icon="/icons/pluginIcon.svg"
-                    factoryClass="com.github.julienma94.intellijplugintest.ui.main.MainView"/>
+                    factoryClass="com.correomqtt.intellij.ui.main.MainView"/>
 
         <applicationService
-                serviceInterface="com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationService"
-                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.activation.ApplicationActivationServiceImpl"
+                serviceInterface="com.correomqtt.intellij.core.services.activation.ApplicationActivationService"
+                serviceImplementation="com.correomqtt.intellij.core.services.activation.ApplicationActivationServiceImpl"
                 id="ApplicationActivation"
         />
 
         <applicationService
-                serviceInterface="com.github.julienma94.intellijplugintest.core.services.tabmanagement.TabService"
-                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.tabmanagement.TabServiceImpl"
+                serviceInterface="com.correomqtt.intellij.core.services.tabmanagement.TabService"
+                serviceImplementation="com.correomqtt.intellij.core.services.tabmanagement.TabServiceImpl"
                 id="TabManagement"
         />
 
         <applicationService
-                serviceInterface="com.github.julienma94.intellijplugintest.core.services.publish.PublishService"
-                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.publish.PublishServiceImpl"
+                serviceInterface="com.correomqtt.intellij.core.services.publish.PublishService"
+                serviceImplementation="com.correomqtt.intellij.core.services.publish.PublishServiceImpl"
                 id="PublishService"
         />
 
         <applicationService
-                serviceInterface="com.github.julienma94.intellijplugintest.core.services.subscribe.SubscribeService"
-                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.subscribe.SubscribeServiceImpl"
+                serviceInterface="com.correomqtt.intellij.core.services.subscribe.SubscribeService"
+                serviceImplementation="com.correomqtt.intellij.core.services.subscribe.SubscribeServiceImpl"
                 id="SubscribeService"
         />
 
         <applicationService
-                serviceInterface="com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerService"
-                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.connection.ConnectionManagerServiceImpl"
+                serviceInterface="com.correomqtt.intellij.core.services.connection.ConnectionManagerService"
+                serviceImplementation="com.correomqtt.intellij.core.services.connection.ConnectionManagerServiceImpl"
                 id="ConnectionManager"
         />
 
         <applicationService
-                serviceInterface="com.github.julienma94.intellijplugintest.core.services.secruity.KeyringManagerService"
-                serviceImplementation="com.github.julienma94.intellijplugintest.core.services.secruity.KeyringManagerServiceImpl"
+                serviceInterface="com.correomqtt.intellij.core.services.secruity.KeyringManagerService"
+                serviceImplementation="com.correomqtt.intellij.core.services.secruity.KeyringManagerServiceImpl"
                 id="KeyringManager"
         />
     </extensions>
 
     <applicationListeners>
-        <listener class="com.github.julienma94.intellijplugintest.core.listeners.ApplicationActivationListener"
+        <listener class="com.correomqtt.intellij.core.listeners.ApplicationActivationListener"
                   topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 </idea-plugin>
