@@ -2,6 +2,7 @@ package com.correomqtt.intellij.ui.subscribe
 
 import com.correomqtt.intellij.core.services.subscribe.SubscribeService
 import com.correomqtt.intellij.ui.common.PayloadArea
+import com.correomqtt.intellij.ui.subscribe.topic.TopicListView
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
@@ -39,8 +40,7 @@ class SubscribeView @Inject constructor(@Assisted project: Project, topicListVie
         val constraints = GridBagConstraints()
 
         // Add panels to mainPanel
-        val messageListViewFactory = MessageListViewFactory()
-        val messageListView = messageListViewFactory.create(project)
+        val messageListView = MessageListViewFactory().create(project)
 
         constraints.gridx = 0
         constraints.weightx = 0.2

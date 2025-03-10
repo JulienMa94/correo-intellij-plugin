@@ -1,4 +1,4 @@
-package com.correomqtt.intellij.ui.subscribe
+package com.correomqtt.intellij.ui.subscribe.message
 
 import com.correomqtt.intellij.ui.connection.CONNECTION_SELECTED_TOPIC
 import com.correomqtt.intellij.ui.connection.ConnectionSelectionListener

@@ -1,4 +1,4 @@
-package com.correomqtt.intellij.ui.subscribe
+package com.correomqtt.intellij.ui.subscribe.topic
 
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane

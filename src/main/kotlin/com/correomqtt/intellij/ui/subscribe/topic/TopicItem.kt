@@ -1,4 +1,4 @@
-package com.correomqtt.intellij.ui.subscribe
+package com.correomqtt.intellij.ui.subscribe.topic
 
 import com.correomqtt.intellij.ui.common.Row
 import com.intellij.icons.AllIcons

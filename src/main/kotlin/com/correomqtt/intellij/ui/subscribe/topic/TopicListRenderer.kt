@@ -1,11 +1,10 @@
-package com.correomqtt.intellij.ui.subscribe
+package com.correomqtt.intellij.ui.subscribe.topic
 
 import com.intellij.util.ui.JBUI
 import java.awt.*
 import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.ListCellRenderer
-import javax.swing.border.EmptyBorder
 
 class TopicListRenderer() : JPanel(), ListCellRenderer<String> {
     init {
