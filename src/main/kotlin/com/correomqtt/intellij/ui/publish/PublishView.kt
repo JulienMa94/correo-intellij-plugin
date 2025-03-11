@@ -12,6 +12,7 @@ import java.awt.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
+//TODO Retained flag
 class PublishView {
     private val publishService = service<PublishService>()
     private val content = JPanel(BorderLayout())
@@ -39,7 +40,7 @@ class PublishView {
             AllIcons.Actions.Execute
         ) {
             override fun actionPerformed(e: AnActionEvent) {
-                publishService.publish(topicTextField.text, payloadArea.text, comboBox.selectedItem as Qos)
+                publishService.publish(topicTextField.text, payloadArea.text, comboBox.selectedItem as Qos, false)
             }
         }
 

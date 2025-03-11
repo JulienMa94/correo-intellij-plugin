@@ -17,11 +17,12 @@ class PublishServiceImpl : PublishService{
 
     private val publishTaskFactory: PublishTaskFactory = guiCore.getPublishTaskManager()
 
-    override fun publish(topic: String, payload: String, qos: Qos) {
+    override fun publish(topic: String, payload: String, qos: Qos, retained: Boolean) {
         val messageDTO = MessageDTO.builder()
             .topic(topic)
             .payload(payload)
             .qos(qos)
+            .isRetained(retained)
             .messageId(UUID.randomUUID().toString())
             .messageType(MessageType.OUTGOING)
             .dateTime(LocalDateTime.now())
