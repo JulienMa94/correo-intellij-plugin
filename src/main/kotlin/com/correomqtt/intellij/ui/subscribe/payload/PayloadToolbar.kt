@@ -8,6 +8,7 @@ import org.correomqtt.core.model.MessageDTO
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import javax.swing.Box
 import javax.swing.JLabel
 import javax.swing.JPanel
 
@@ -29,10 +30,16 @@ class PayloadToolbar(project: Project) : JPanel(BorderLayout()) {
         container.add(timeStampLabel, constraints)
 
         constraints.gridx = 1
+        container.add(Box.createHorizontalStrut(16), constraints)
+
+        constraints.gridx = 2
         constraints.weightx = 0.3
         container.add(qosLabel, constraints)
 
-        constraints.gridx = 2
+        constraints.gridx = 3
+        container.add(Box.createHorizontalStrut(16), constraints)
+
+        constraints.gridx = 4
         constraints.weightx = 0.3
         container.add(retainLabel, constraints)
 
