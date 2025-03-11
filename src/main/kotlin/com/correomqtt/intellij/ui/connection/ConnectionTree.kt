@@ -29,6 +29,7 @@ import javax.swing.tree.TreePath
 @DefaultBean
 class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLayout()) {
     private val service = service<ConnectionManagerService>()
+    private val settingsManager = SoyDi.inject(GuiCore::class.java).getSettingsManager()
     private val rootNode = DefaultMutableTreeNode("MQTT Connections")
     private val treeModel: DefaultTreeModel = DefaultTreeModel(rootNode)
     private val tree = Tree(treeModel).apply { isRootVisible = true }
@@ -221,8 +222,18 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
 
             println("Received new node name: $connectionDTO")
 
+            val connections = service.getConnections().toMutableList()
+            connections.add(connectionDTO)
+
+            settingsManager.saveConnections(connections, "CorreoMQTT_Plugin").run {
+
+            }
+
             rootNode.add(newNode)
             treeModel.reload(rootNode)
+
+
+
         }
     }
 

@@ -8,7 +8,6 @@ import org.correomqtt.di.SoyDi
 class ApplicationActivationServiceImpl : ApplicationActivationService {
 
     private lateinit var app: CorreoPlugin
-
     private var isInitialized = false
 
     override fun init() {

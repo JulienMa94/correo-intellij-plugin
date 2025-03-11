@@ -19,8 +19,6 @@ class GuiCore @Inject constructor(
     private var connectionLifecycleTaskFactories: ConnectionLifecycleTaskFactories,
     private var publishTaskFactory: PublishTaskFactory,
     private var subscribeTaskFactory: SubscribeTaskFactory,
-    private var keyringFactory: KeyringFactory,
-    private var secretStoreProvider: SecretStoreProvider
 ) {
 
     private var connectionManager: ConnectionManager = coreManager.connectionManager
@@ -49,13 +47,5 @@ class GuiCore @Inject constructor(
 
     fun getConnectionLifecycleTaskFactory(): ConnectionLifecycleTaskFactories {
         return this.connectionLifecycleTaskFactories;
-    }
-
-    fun getSecretStoreProvider(): SecretStoreProvider {
-        return this.secretStoreProvider;
-    }
-
-    fun getKeyringFactory(): KeyringFactory {
-        return this.keyringFactory;
     }
 }
