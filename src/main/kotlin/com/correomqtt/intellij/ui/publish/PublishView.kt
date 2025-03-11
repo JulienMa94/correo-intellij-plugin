@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.util.ui.JBUI
 import org.correomqtt.core.model.Qos
 import java.awt.*
 import javax.swing.*
@@ -25,7 +26,7 @@ class PublishView {
         rowScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
         rowScrollPane.preferredSize = Dimension(content.width, content.height)
-        rowScrollPane.border = EmptyBorder(16, 0, 16, 0)
+        rowScrollPane.border = JBUI.Borders.empty(16, 0)
 
         val topicTextField = JTextField()
         topicTextField.preferredSize = Dimension(350, topicTextField.preferredSize.height) // Set fixed width
@@ -40,7 +41,7 @@ class PublishView {
             AllIcons.Actions.Execute
         ) {
             override fun actionPerformed(e: AnActionEvent) {
-                publishService.publish(topicTextField.text, payloadArea.text, comboBox.selectedItem as Qos, false)
+                publishService.publish(topicTextField.text, payloadArea.text, comboBox.selectedItem as Qos, true)
             }
         }
 

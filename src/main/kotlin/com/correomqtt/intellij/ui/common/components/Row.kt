@@ -18,6 +18,6 @@ open class Row(isSelected: Boolean): JPanel(BorderLayout()) {
 
         minimumSize = Dimension(0, 48)
         maximumSize = Dimension(Int.MAX_VALUE, 48)
-        border = JBUI.Borders.empty(8, 16)
+        border = JBUI.Borders.empty(8, 16, 8, 4)
     }
 }

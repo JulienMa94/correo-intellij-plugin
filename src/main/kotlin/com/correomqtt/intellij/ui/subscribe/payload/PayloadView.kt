@@ -11,6 +11,7 @@ import javax.swing.JPanel
 class PayloadView(project: Project) : JPanel(BorderLayout()) {
     init {
         val payloadArea = PayloadArea().createJsonTextArea()
+        add(PayloadToolbar(project), BorderLayout.NORTH)
         add(payloadArea, BorderLayout.CENTER)
 
         val messageBus = project.messageBus.connect()

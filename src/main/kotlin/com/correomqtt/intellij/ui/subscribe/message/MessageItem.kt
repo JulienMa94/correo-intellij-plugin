@@ -18,9 +18,12 @@ class MessageItem(message: IncomingMessageEvent, isSelected: Boolean) : Row(isSe
         val timestamp = JLabel(message.messageDTO.dateTime.toString())
         val payload = JLabel(message.messageDTO.payload)
 
-        val placeholderIcon =
-            if (message.messageDTO.isRetained) IconHelper.createGreyIcon(AllIcons.Actions.Install) else AllIcons.Actions.Install
-        val placeholderLabel = JLabel(placeholderIcon)
+        val retainedIcon = if (message.messageDTO.isRetained) {
+            AllIcons.Actions.Install
+        } else {
+            IconHelper.createGreyIcon(AllIcons.Actions.Install)
+        }
+        val placeholderLabel = JLabel(retainedIcon)
 
         // Create a container panel for the WEST side to hold both placeholderLabel and payload
         val westPanel = JPanel(FlowLayout(FlowLayout.LEFT, 16, 0)) // Adds horizontal gap of 16px between components
