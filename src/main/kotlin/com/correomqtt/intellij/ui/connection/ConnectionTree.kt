@@ -2,20 +2,21 @@ package com.correomqtt.intellij.ui.connection
 
 import com.correomqtt.intellij.GuiCore
 import com.correomqtt.intellij.core.services.connection.ConnectionManagerService
-import com.correomqtt.intellij.ui.common.events.CONNECTION_SELECTED_TOPIC
+import com.correomqtt.intellij.ui.common.events.ON_CONNECTION_SELECTED_TOPIC
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.treeStructure.Tree
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import org.correomqtt.core.connection.ConnectionState
 import org.correomqtt.core.connection.ConnectionStateChangedEvent
 import org.correomqtt.core.model.ConnectionConfigDTO
 import org.correomqtt.di.Assisted
 import org.correomqtt.di.DefaultBean
+import org.correomqtt.di.Inject
 import org.correomqtt.di.Observes
-import org.correomqtt.di.SoyDi
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -29,9 +30,9 @@ import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
 
 @DefaultBean
-class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLayout()) {
+class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: GuiCore) : JPanel(BorderLayout()) {
     private val service = service<ConnectionManagerService>()
-    private val settingsManager = SoyDi.inject(GuiCore::class.java).getSettingsManager()
+    private val settingsManager = guiCore.getSettingsManager()
     private val rootNode = DefaultMutableTreeNode("MQTT Connections")
     private val treeModel: DefaultTreeModel = DefaultTreeModel(rootNode)
     private val tree = Tree(treeModel).apply { isRootVisible = true }
@@ -94,13 +95,13 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
                         serverIconLabel.preferredSize = Dimension(16, 16)
                         gbc.gridx = 0
                         gbc.gridy = 0
-                        gbc.insets = Insets(0, 0, 0, 5) // Right padding
+                        gbc.insets = JBUI.insetsRight(5) // Right padding
                         panel.add(serverIconLabel, gbc)
 
                         val connectionState = connectionStateMap[connectionInfo.id]
 
                         gbc.gridx = 1
-                        gbc.insets = Insets(0, 0, 0, 5) // Right padding
+                        gbc.insets = JBUI.insetsRight(5) // Right padding
 
                         when (connectionState) {
                             ConnectionState.CONNECTED -> {
@@ -169,7 +170,7 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
                         if (nodeData != null) {
                             // Hier wird die spezifische Verbindung verarbeitet
                             service.connect(nodeData, tree.getRowForPath(tree.selectionPath))
-                            project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC)
+                            project.messageBus.syncPublisher(ON_CONNECTION_SELECTED_TOPIC)
                                 .onConnectionSelected(nodeData.name, nodeData.id)
                         }
                     }
@@ -183,7 +184,7 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
                             val isConnected = service.switch(nodeData)
 
                             if (isConnected) {
-                                project.messageBus.syncPublisher(CONNECTION_SELECTED_TOPIC)
+                                project.messageBus.syncPublisher(ON_CONNECTION_SELECTED_TOPIC)
                                     .onConnectionSelected(nodeData.name, nodeData.id)
                             }
                         }
@@ -203,7 +204,6 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
         }
 
     }
-
 
     private fun getConnectionDetails(connectionConfig: ConnectionConfigDTO): List<ConnectionConfigDTO> {
         // Dummy-Methode zum Abrufen spezifischer Verbindungen (hier können Sie Ihre Logik hinzufügen)

@@ -1,8 +1,8 @@
 package com.correomqtt.intellij.ui.subscribe.message
 
-import com.correomqtt.intellij.ui.common.events.CONNECTION_SELECTED_TOPIC
+import com.correomqtt.intellij.ui.common.events.ON_CONNECTION_SELECTED_TOPIC
 import com.correomqtt.intellij.ui.common.events.ConnectionSelectionListener
-import com.correomqtt.intellij.ui.common.events.MESSAGE_SELECTED
+import com.correomqtt.intellij.ui.common.events.ON_MESSAGE_SELECTED
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
@@ -24,7 +24,7 @@ class MessageListView constructor (@Assisted project: Project) : JPanel(BorderLa
     init {
         val connection = project.messageBus.connect();
 
-        connection.subscribe(CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
+        connection.subscribe(ON_CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
             override fun onConnectionSelected(name: String, id: String) {
                 println("Connection selected received in message list view: $name, $id")
             }
@@ -43,7 +43,7 @@ class MessageListView constructor (@Assisted project: Project) : JPanel(BorderLa
                     val selectedItem = jbList.selectedValue
                     if (selectedItem != null) {
                         println("Selected item: $selectedItem")
-                        project.messageBus.syncPublisher(MESSAGE_SELECTED).onMessageSelected(selectedItem.messageDTO)
+                        project.messageBus.syncPublisher(ON_MESSAGE_SELECTED).onMessageSelected(selectedItem.messageDTO)
                     }
                 }
 

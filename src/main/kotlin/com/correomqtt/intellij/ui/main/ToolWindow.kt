@@ -1,7 +1,7 @@
 package com.correomqtt.intellij.ui.main
 
 import com.correomqtt.intellij.ui.common.components.DefaultPanel
-import com.correomqtt.intellij.ui.common.events.CONNECTION_SELECTED_TOPIC
+import com.correomqtt.intellij.ui.common.events.ON_CONNECTION_SELECTED_TOPIC
 import com.correomqtt.intellij.ui.common.events.ConnectionSelectionListener
 import com.correomqtt.intellij.ui.connection.ConnectionTree
 import com.correomqtt.intellij.ui.connection.ConnectionTreeFactory
@@ -17,7 +17,7 @@ import javax.swing.JPanel
 
 @DefaultBean
 class ToolWindow @Inject constructor(@Assisted project: Project): JPanel(BorderLayout()) {
-    private val splitter: JBSplitter = JBSplitter(false, 0.12f)
+    private val splitter: JBSplitter = JBSplitter(false, 0.15f)
     private val tabManager: TabManager = TabManagerFactory().create(project)
     private val connectionTree: ConnectionTree = ConnectionTreeFactory().create(project)
 
@@ -25,7 +25,7 @@ class ToolWindow @Inject constructor(@Assisted project: Project): JPanel(BorderL
         val messageBus = project.messageBus.connect()
         splitter.border = null;
 
-        messageBus.subscribe(CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
+        messageBus.subscribe(ON_CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
             override fun onConnectionSelected(name: String, id: String) {
                 println("Connection selected: $name, $id")
                 splitter.secondComponent = tabManager

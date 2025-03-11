@@ -20,7 +20,7 @@ class TabManager @Inject constructor(@Assisted var project: Project): JTabbedPan
         addTab("Subscribe", createTabContent(subscribeContent))
 
         // Create the "Publish" tab
-        val publishContent = PublishView().getPublishContent()
+        val publishContent = PublishView(project)
         addTab("Publish", createTabContent(publishContent))
     }
 

@@ -35,7 +35,7 @@ class SubscribeView @Inject constructor(@Assisted project: Project, topicListVie
         constraints.weightx = 0.2
         constraints.weighty = 1.0
         constraints.fill = GridBagConstraints.BOTH
-        constraints.insets = JBUI.insetsRight(8)
+        constraints.insets = JBUI.insetsRight(24)
         mainPanel.add(topicListView, constraints)
 
         constraints.gridx = 1

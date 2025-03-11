@@ -29,6 +29,8 @@ class Toolbar: JPanel(BorderLayout()) {
         textField.preferredSize = Dimension(400, textField.preferredSize.height) // Set fixed width
         comboBox.preferredSize = Dimension(100, comboBox.preferredSize.height) // Set fixed width
         comboBox.maximumSize = Dimension(100, comboBox.preferredSize.height) // Set fixed width
+        subscribeButton.preferredSize = Dimension(100, subscribeButton.preferredSize.height) // Set fixed width
+
 
         val subscribeAction = object : DumbAwareAction(
             "Subscribing to ${textField.text}",
