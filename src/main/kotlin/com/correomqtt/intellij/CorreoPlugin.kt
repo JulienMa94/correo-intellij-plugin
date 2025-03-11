@@ -1,6 +1,6 @@
 package com.correomqtt.intellij
 
-import com.github.julienma94.intellijplugintest.core.services.secruity.KeyringManager
+import com.correomqtt.intellij.core.services.secruity.KeyringManager
 import com.intellij.openapi.diagnostic.thisLogger
 import org.correomqtt.core.CorreoCore
 import org.correomqtt.di.Inject

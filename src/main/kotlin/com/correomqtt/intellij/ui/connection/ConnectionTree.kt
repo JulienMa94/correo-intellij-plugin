@@ -1,5 +1,6 @@
 package com.correomqtt.intellij.ui.connection
 
+import com.correomqtt.intellij.GuiCore
 import com.correomqtt.intellij.core.services.connection.ConnectionManagerService
 import com.correomqtt.intellij.ui.common.events.CONNECTION_SELECTED_TOPIC
 import com.intellij.icons.AllIcons
@@ -14,6 +15,7 @@ import org.correomqtt.core.model.ConnectionConfigDTO
 import org.correomqtt.di.Assisted
 import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Observes
+import org.correomqtt.di.SoyDi
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -34,7 +36,6 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
     private val treeModel: DefaultTreeModel = DefaultTreeModel(rootNode)
     private val tree = Tree(treeModel).apply { isRootVisible = true }
     private val connectionStateMap = mutableMapOf<String, ConnectionState>()
-    private lateinit var project: Project
 
     init {
         val connections = service.getConnections();
@@ -53,7 +54,7 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
 
 
         val decorator = ToolbarDecorator.createDecorator(tree)
-            .setAddAction { addNode() }
+            .setAddAction { addNode(project) }
             .setRemoveAction { removeNode() }
             .setAddIcon(AllIcons.General.Add)
 
@@ -209,11 +210,7 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
         return listOf() // Gibt eine leere Liste zurück oder relevante Verbindungen
     }
 
-    fun addProject(project: Project) {
-        this.project = project
-    }
-
-    private fun addNode() {
+    private fun addNode(project: Project) {
         val dialog = AddConnectionDialog(project)
 
         if (dialog.showAndGet()) {
@@ -231,9 +228,6 @@ class ConnectionTree constructor (@Assisted project: Project) : JPanel(BorderLay
 
             rootNode.add(newNode)
             treeModel.reload(rootNode)
-
-
-
         }
     }
 

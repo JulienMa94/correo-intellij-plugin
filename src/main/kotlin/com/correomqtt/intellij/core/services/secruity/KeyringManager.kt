@@ -1,6 +1,7 @@
-package com.github.julienma94.intellijplugintest.core.services.secruity
+package com.correomqtt.intellij.core.services.secruity
 
-import com.github.julienma94.intellijplugintest.GuiCore
+import com.correomqtt.intellij.GuiCore
+import com.correomqtt.intellij.core.services.security.IntellijKeyring
 import org.correomqtt.core.model.SettingsDTO
 import org.correomqtt.core.settings.SettingsManager
 import org.correomqtt.di.SingletonBean

@@ -1,4 +1,4 @@
-package com.github.julienma94.intellijplugintest.core.services.secruity
+package com.correomqtt.intellij.core.services.security
 
 import com.intellij.credentialStore.CredentialAttributes
 import com.intellij.credentialStore.Credentials

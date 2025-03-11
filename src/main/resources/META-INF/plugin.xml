@@ -35,12 +35,6 @@
                 serviceImplementation="com.correomqtt.intellij.core.services.connection.ConnectionManagerServiceImpl"
                 id="ConnectionManager"
         />
-
-        <applicationService
-                serviceInterface="com.correomqtt.intellij.core.services.secruity.KeyringManagerService"
-                serviceImplementation="com.correomqtt.intellij.core.services.secruity.KeyringManagerServiceImpl"
-                id="KeyringManager"
-        />
     </extensions>
 
     <applicationListeners>
