@@ -12,3 +12,5 @@
 - Ein Doppelklick auf ein Item öffnet eine detailierte Ansicht der empfangen Nachricht
 
 - Tab Close button soll ganz rechts aligned sein
+
+- [ ] Add additional docker containers for other Brokers
