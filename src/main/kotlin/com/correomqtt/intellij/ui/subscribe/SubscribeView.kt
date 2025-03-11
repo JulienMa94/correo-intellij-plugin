@@ -19,14 +19,14 @@ import javax.swing.JScrollPane
 class SubscribeView @Inject constructor(@Assisted project: Project, topicListView: TopicListView) : JPanel(BorderLayout()) {
 
     init {
-        // Layout for main content
-        val toolbar = Toolbar()
-        val mainPanel = JPanel(GridBagLayout())
-        val constraints = GridBagConstraints()
-
-        // Add panels to mainPanel
         val messageListView = MessageListViewFactory().create(project)
+        val toolbar = Toolbar()
+        val payloadArea = PayloadArea().createJsonTextArea()
 
+        val mainPanel = JPanel(GridBagLayout())
+        val mainScrollPane = JBScrollPane(mainPanel)
+
+        val constraints = GridBagConstraints()
         constraints.gridx = 0
         constraints.weightx = 0.2
         constraints.weighty = 1.0
@@ -42,9 +42,8 @@ class SubscribeView @Inject constructor(@Assisted project: Project, topicListVie
         constraints.gridx = 2
         constraints.weightx = 0.6
         constraints.weighty = 1.0
-        mainPanel.add(PayloadArea().createJsonTextArea(), constraints)
+        mainPanel.add(payloadArea, constraints)
 
-        val mainScrollPane = JBScrollPane(mainPanel)
         mainScrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         mainScrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         mainScrollPane.border = JBUI.Borders.emptyTop(16)
