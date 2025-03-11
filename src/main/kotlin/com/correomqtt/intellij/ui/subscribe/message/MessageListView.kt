@@ -1,7 +1,8 @@
 package com.correomqtt.intellij.ui.subscribe.message
 
-import com.correomqtt.intellij.ui.connection.CONNECTION_SELECTED_TOPIC
-import com.correomqtt.intellij.ui.connection.ConnectionSelectionListener
+import com.correomqtt.intellij.ui.common.events.CONNECTION_SELECTED_TOPIC
+import com.correomqtt.intellij.ui.common.events.ConnectionSelectionListener
+import com.correomqtt.intellij.ui.common.events.MESSAGE_SELECTED
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
@@ -38,6 +39,14 @@ class MessageListView constructor (@Assisted project: Project) : JPanel(BorderLa
 
         jbList.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 1) {
+                    val selectedItem = jbList.selectedValue
+                    if (selectedItem != null) {
+                        println("Selected item: $selectedItem")
+                        project.messageBus.syncPublisher(MESSAGE_SELECTED).onMessageSelected(selectedItem.messageDTO)
+                    }
+                }
+
                 if (e.clickCount == 2) {  // Double-click action
                     val selectedItem = jbList.selectedValue
                     if (selectedItem != null) {

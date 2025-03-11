@@ -1,6 +1,6 @@
 package com.correomqtt.intellij.ui.subscribe.message
 
-import com.correomqtt.intellij.ui.common.Row
+import com.correomqtt.intellij.ui.common.components.Row
 import com.correomqtt.intellij.ui.util.IconHelper
 import com.intellij.icons.AllIcons
 import org.correomqtt.core.pubsub.IncomingMessageEvent

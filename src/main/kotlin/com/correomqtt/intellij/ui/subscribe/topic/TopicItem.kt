@@ -1,6 +1,6 @@
 package com.correomqtt.intellij.ui.subscribe.topic
 
-import com.correomqtt.intellij.ui.common.Row
+import com.correomqtt.intellij.ui.common.components.Row
 import com.intellij.icons.AllIcons
 import java.awt.BorderLayout
 import java.awt.Dimension

@@ -1,4 +1,4 @@
-package com.correomqtt.intellij.ui.common
+package com.correomqtt.intellij.ui.common.components
 
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager

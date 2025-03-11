@@ -1,7 +1,7 @@
 package com.correomqtt.intellij.ui.publish
 
 import com.correomqtt.intellij.core.services.publish.PublishService
-import com.correomqtt.intellij.ui.common.PayloadArea
+import com.correomqtt.intellij.ui.common.components.PayloadArea
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext

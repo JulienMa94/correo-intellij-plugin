@@ -1,7 +1,7 @@
 package com.correomqtt.intellij.ui.subscribe
 
-import com.correomqtt.intellij.ui.common.PayloadArea
 import com.correomqtt.intellij.ui.subscribe.message.MessageListViewFactory
+import com.correomqtt.intellij.ui.subscribe.payload.PayloadView
 import com.correomqtt.intellij.ui.subscribe.topic.TopicListView
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
@@ -21,7 +21,7 @@ class SubscribeView @Inject constructor(@Assisted project: Project, topicListVie
     init {
         val messageListView = MessageListViewFactory().create(project)
         val toolbar = Toolbar()
-        val payloadArea = PayloadArea().createJsonTextArea()
+        val payloadArea = PayloadView(project)
 
         val mainPanel = JPanel(GridBagLayout())
         val mainScrollPane = JBScrollPane(mainPanel)

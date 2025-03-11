@@ -1,6 +1,7 @@
 package com.correomqtt.intellij.ui.connection
 
 import com.correomqtt.intellij.core.services.connection.ConnectionManagerService
+import com.correomqtt.intellij.ui.common.events.CONNECTION_SELECTED_TOPIC
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -12,7 +13,6 @@ import org.correomqtt.core.connection.ConnectionStateChangedEvent
 import org.correomqtt.core.model.ConnectionConfigDTO
 import org.correomqtt.di.Assisted
 import org.correomqtt.di.DefaultBean
-import org.correomqtt.di.Inject
 import org.correomqtt.di.Observes
 import java.awt.*
 import java.awt.event.MouseAdapter

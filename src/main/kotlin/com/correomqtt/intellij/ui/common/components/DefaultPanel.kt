@@ -1,11 +1,9 @@
-package com.correomqtt.intellij.ui.common
+package com.correomqtt.intellij.ui.common.components
 
 import com.intellij.ui.JBColor
 import com.intellij.util.ui.JBUI
-import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.awt.Insets
 import javax.swing.JLabel
 import javax.swing.JPanel
 
