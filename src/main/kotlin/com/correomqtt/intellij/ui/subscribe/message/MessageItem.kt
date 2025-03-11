@@ -2,6 +2,7 @@ package com.correomqtt.intellij.ui.subscribe.message
 
 import com.correomqtt.intellij.ui.common.components.Row
 import com.correomqtt.intellij.ui.util.IconHelper
+import com.correomqtt.intellij.ui.util.TimestampHelper
 import com.intellij.icons.AllIcons
 import org.correomqtt.core.pubsub.IncomingMessageEvent
 import java.awt.BorderLayout
@@ -15,7 +16,7 @@ class MessageItem(message: IncomingMessageEvent, isSelected: Boolean) : Row(isSe
     init {
         val topic = JLabel(message.messageDTO.topic)
         topic.font = topic.font.deriveFont(Font.BOLD)
-        val timestamp = JLabel(message.messageDTO.dateTime.toString())
+        val timestamp = JLabel(TimestampHelper().format(message.messageDTO.dateTime.toString()))
         val payload = JLabel(message.messageDTO.payload)
 
         val retainedIcon = if (message.messageDTO.isRetained) {

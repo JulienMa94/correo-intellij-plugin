@@ -2,6 +2,7 @@ package com.correomqtt.intellij.ui.subscribe.payload
 
 import com.correomqtt.intellij.ui.common.events.ON_MESSAGE_SELECTED
 import com.correomqtt.intellij.ui.common.events.MessageSelectionListener
+import com.correomqtt.intellij.ui.util.TimestampHelper
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.JBUI
 import org.correomqtt.core.model.MessageDTO
@@ -53,7 +54,7 @@ class PayloadToolbar(project: Project) : JPanel(BorderLayout()) {
 
         messageBus.subscribe(ON_MESSAGE_SELECTED, object : MessageSelectionListener {
             override fun onMessageSelected(message: MessageDTO) {
-                timeStampLabel.text = "Timestamp: ${message.dateTime}"
+                timeStampLabel.text = "Timestamp: ${TimestampHelper().format(message.dateTime.toString())}"
                 qosLabel.text = "QoS: ${message.qos}"
                 retainLabel.text = "Retain: ${message.isRetained}"
             }
