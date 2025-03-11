@@ -12,6 +12,12 @@ import javax.swing.Box
 import javax.swing.JLabel
 import javax.swing.JPanel
 
+/**
+ * TODO:
+ *  - Extract components
+ *  - Correct grey tone for info text
+ *  - Spacing
+ */
 class PayloadToolbar(project: Project) : JPanel(BorderLayout()) {
     init {
         val timeStampLabel = JLabel("Timestamp: -")

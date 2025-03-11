@@ -13,7 +13,12 @@ import java.awt.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
-//TODO Retained flag
+/**
+ * TODO:
+ *  - Refactor Publish view to separate smaller components
+ *  - Add Retained flag to publish
+ *  - Cleanup
+ */
 class PublishView {
     private val publishService = service<PublishService>()
     private val content = JPanel(BorderLayout())

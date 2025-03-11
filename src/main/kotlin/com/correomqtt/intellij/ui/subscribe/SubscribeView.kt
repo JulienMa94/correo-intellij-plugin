@@ -15,6 +15,10 @@ import java.awt.GridBagLayout
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
+/**
+ * TODO:
+ *  - Make elements resizable
+ */
 @DefaultBean
 class SubscribeView @Inject constructor(@Assisted project: Project, topicListView: TopicListView) : JPanel(BorderLayout()) {
 
