@@ -242,9 +242,7 @@ class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: Gu
             val connections = service.getConnections().toMutableList()
             connections.add(connectionDTO)
 
-            settingsManager.saveConnections(connections, "CorreoMQTT_Plugin").run {
-
-            }
+            settingsManager.saveConnections(connections, "CorreoMQTT_Plugin").run {}
 
             rootNode.add(newNode)
             treeModel.reload(rootNode)

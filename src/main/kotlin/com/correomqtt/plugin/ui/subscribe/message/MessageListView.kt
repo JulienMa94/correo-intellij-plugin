@@ -7,6 +7,7 @@ import com.correomqtt.plugin.ui.common.events.ON_MESSAGE_SELECTED
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
+import org.correomqtt.core.fileprovider.PersistSubscribeHistoryUpdateEvent
 import org.correomqtt.core.fileprovider.PublishHistory
 import org.correomqtt.core.fileprovider.PublishMessageHistory
 import org.correomqtt.core.fileprovider.SubscriptionHistory
@@ -63,5 +64,7 @@ class MessageListView constructor(@Assisted project: Project) : JPanel(BorderLay
     fun incomingMessageEvent(@Observes event: IncomingMessageEvent) {
         println("Received incoming message event for topic ${event.messageDTO.topic}")
         listModel.addElement(event)
+        jbList.revalidate()
+        jbList.repaint()
     }
 }
