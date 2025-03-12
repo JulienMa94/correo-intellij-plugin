@@ -1,6 +1,12 @@
 package com.correomqtt.plugin.core.services.connection
 
 import com.correomqtt.plugin.GuiCore
+import com.correomqtt.plugin.core.services.subscribe.SubscribeService
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import org.correomqtt.core.fileprovider.PublishHistory
+import org.correomqtt.core.fileprovider.PublishMessageHistory
+import org.correomqtt.core.fileprovider.SubscriptionHistory
 import org.correomqtt.core.model.*
 import org.correomqtt.core.settings.SettingsManager
 import org.correomqtt.di.SoyDi
@@ -69,6 +75,7 @@ class ConnectionManagerServiceImpl : ConnectionManagerService {
         if (listIndexToConnectionId.containsValue(id)) {
             println("Switching to $name, $id")
             setActiveConnectionId(id)
+
             return true;
         } else {
             println("Connection not established for $name, $id")
@@ -102,5 +109,4 @@ class ConnectionManagerServiceImpl : ConnectionManagerService {
     override fun getActiveConnectionId(): String {
        return activeConnectionId
     }
-
 }

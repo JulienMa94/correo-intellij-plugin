@@ -2,7 +2,7 @@ package com.correomqtt.plugin.ui.connection
 
 import com.correomqtt.plugin.GuiCore
 import com.correomqtt.plugin.core.services.connection.ConnectionManagerService
-import com.correomqtt.plugin.ui.common.events.ON_CONNECTION_SELECTED_TOPIC
+import com.correomqtt.plugin.core.services.history.HistoryManagerService
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -32,6 +32,7 @@ import javax.swing.tree.TreePath
 @DefaultBean
 class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: GuiCore) : JPanel(BorderLayout()) {
     private val service = service<ConnectionManagerService>()
+    private val historyService = service<HistoryManagerService>();
     private val settingsManager = guiCore.getSettingsManager()
     private val rootNode = DefaultMutableTreeNode("MQTT Connections")
     private val treeModel: DefaultTreeModel = DefaultTreeModel(rootNode)
@@ -170,8 +171,9 @@ class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: Gu
                         if (nodeData != null) {
                             // Hier wird die spezifische Verbindung verarbeitet
                             service.connect(nodeData, tree.getRowForPath(tree.selectionPath))
-                            project.messageBus.syncPublisher(ON_CONNECTION_SELECTED_TOPIC)
-                                .onConnectionSelected(nodeData.name, nodeData.id)
+                            /* project.messageBus.syncPublisher(ON_CONNECTION_SELECTED_TOPIC).onConnectionSelected(
+                                 nodeData.name, nodeData.id
+                             )*/
                         }
                     }
                 }
@@ -181,17 +183,35 @@ class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: Gu
                     if (selectedNode != null) {
                         val nodeData = selectedNode.userObject as? ConnectionConfigDTO
                         if (nodeData != null) {
-                            val isConnected = service.switch(nodeData)
+                            service.switch(nodeData)
+                            /* if (isConnected) {
 
-                            if (isConnected) {
-                                project.messageBus.syncPublisher(ON_CONNECTION_SELECTED_TOPIC)
-                                    .onConnectionSelected(nodeData.name, nodeData.id)
-                            }
+
+                                 project.messageBus.syncPublisher(ON_CONNECTION_SELECTED_TOPIC).onConnectionSelected(
+                                     nodeData.name, nodeData.id
+                                 )
+                             }*/
                         }
                     }
                 }
             }
         })
+    }
+
+    /**
+     * Observes connection state changes and updates the tree item state accordingly.
+     */
+    fun onConnectionStateChanged(@Observes event: ConnectionStateChangedEvent) {
+        println("Received connection state change event ${event.state}")
+        connectionStateMap[event.connectionId] = event.state
+        tree.revalidate()
+        tree.repaint()
+
+        if (event.state == ConnectionState.CONNECTED) {
+            val connectionId = event.connectionId
+            historyService.setupHistory(event.connectionId)
+            println("Connection established for $connectionId")
+        }
     }
 
     private fun addConnectionNodes(parentNode: DefaultMutableTreeNode, connectionConfig: ConnectionConfigDTO) {
@@ -241,16 +261,6 @@ class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: Gu
                 treeModel.reload(rootNode)
             }
         }
-    }
-
-    /**
-     * Observes connection state changes and updates the tree item state accordingly.
-     */
-    fun onConnectionStateChanged(@Observes event: ConnectionStateChangedEvent) {
-        println("Received connection state change event ${event.state}")
-        connectionStateMap[event.connectionId] = event.state
-        tree.revalidate()
-        tree.repaint()
     }
 }
 

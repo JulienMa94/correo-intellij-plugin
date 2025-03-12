@@ -1,5 +1,6 @@
 package com.correomqtt.plugin.ui.subscribe
 
+import com.correomqtt.plugin.ui.subscribe.message.MessageListViewFactory
 import com.correomqtt.plugin.ui.subscribe.payload.PayloadView
 import com.correomqtt.plugin.ui.subscribe.topic.TopicListView
 import com.intellij.openapi.project.Project
@@ -10,22 +11,17 @@ import org.correomqtt.di.DefaultBean
 import org.correomqtt.di.Inject
 import java.awt.BorderLayout
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
-/**
- * TODO:
- *  - Make elements resizable
- */
 @DefaultBean
 class SubscribeView @Inject constructor(@Assisted project: Project, topicListView: TopicListView) : JPanel(BorderLayout()) {
     private val splitter: JBSplitter = JBSplitter(false, 0.4f)
     private val mainSplitter: JBSplitter = JBSplitter(false, 0.5f)
 
     init {
-        splitter.border = null;
+        splitter.border = JBUI.Borders.emptyLeft(16);
         mainSplitter.border = null;
 
-        val messageListView = com.correomqtt.plugin.ui.subscribe.message.MessageListViewFactory().create(project)
+        val messageListView = MessageListViewFactory().create(project)
         val toolbar = Toolbar()
         val payloadArea = PayloadView(project)
 

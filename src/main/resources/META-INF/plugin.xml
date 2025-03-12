@@ -35,6 +35,12 @@
                 serviceImplementation="com.correomqtt.plugin.core.services.connection.ConnectionManagerServiceImpl"
                 id="ConnectionManager"
         />
+
+        <applicationService
+                serviceInterface="com.correomqtt.plugin.core.services.history.HistoryManagerService"
+                serviceImplementation="com.correomqtt.plugin.core.services.history.HistoryManagerServiceImpl"
+                id="HistoryManager"
+        />
     </extensions>
 
     <applicationListeners>

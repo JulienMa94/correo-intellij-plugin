@@ -10,6 +10,7 @@ import javax.swing.JPanel
 class DefaultPanel(msg: String): JPanel(GridBagLayout()) {
     init {
         val constraints = GridBagConstraints()
+        border = null
         constraints.anchor = GridBagConstraints.CENTER
         constraints.gridx = 0
         constraints.gridy = 0
