@@ -7,6 +7,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ToolbarDecorator
+import com.intellij.ui.components.JBLabel
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
@@ -21,7 +22,6 @@ import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.BorderFactory
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
@@ -91,7 +91,7 @@ class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: Gu
                         val gbc = GridBagConstraints()
 
                         // Server icon
-                        val serverIconLabel = JLabel(AllIcons.Webreferences.Server)
+                        val serverIconLabel = JBLabel(AllIcons.Webreferences.Server)
                         serverIconLabel.preferredSize = Dimension(16, 16)
                         gbc.gridx = 0
                         gbc.gridy = 0
@@ -105,31 +105,31 @@ class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: Gu
 
                         when (connectionState) {
                             ConnectionState.CONNECTED -> {
-                                val checkLabel = JLabel(AllIcons.General.InspectionsOK)
+                                val checkLabel = JBLabel(AllIcons.General.InspectionsOK)
                                 checkLabel.preferredSize = Dimension(16, 16)
                                 panel.add(checkLabel, gbc)
                             }
 
                             ConnectionState.DISCONNECTED_GRACEFUL, ConnectionState.DISCONNECTED_UNGRACEFUL, ConnectionState.DISCONNECTING -> {
-                                val crossLabel = JLabel(AllIcons.General.Error)
+                                val crossLabel = JBLabel(AllIcons.General.Error)
                                 crossLabel.preferredSize = Dimension(16, 16)
                                 panel.add(crossLabel, gbc)
                             }
 
                             ConnectionState.CONNECTING -> {
-                                val loadingLabel = JLabel(AllIcons.Actions.Refresh)
+                                val loadingLabel = JBLabel(AllIcons.Actions.Refresh)
                                 loadingLabel.preferredSize = Dimension(16, 16)
                                 panel.add(loadingLabel, gbc)
                             }
 
                             ConnectionState.RECONNECTING -> {
-                                val loadingLabel = JLabel(AllIcons.Actions.Refresh)
+                                val loadingLabel = JBLabel(AllIcons.Actions.Refresh)
                                 loadingLabel.preferredSize = Dimension(16, 16)
                                 panel.add(loadingLabel, gbc)
                             }
 
                             null -> {
-                                val loadingLabel = JLabel(AllIcons.General.Error)
+                                val loadingLabel = JBLabel(AllIcons.General.Error)
                                 loadingLabel.preferredSize = Dimension(16, 16)
                                 panel.add(loadingLabel, gbc)
                             }
@@ -137,7 +137,7 @@ class ConnectionTree @Inject constructor(@Assisted project: Project, guiCore: Gu
 
                         // Create a label for the text
                         val labelText = "${connectionInfo.name}  (${connectionInfo.hostAndPort})"
-                        val textLabel = JLabel(labelText)
+                        val textLabel = JBLabel(labelText)
 
                         // Add the text label to the panel
                         gbc.gridx = 2
