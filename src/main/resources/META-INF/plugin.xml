@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.correomqtt.intellij</id>
-    <name>Correo mqtt</name>
+    <id>com.correomqtt.plugin</id>
+    <name>Correo Mqtt</name>
     <vendor>PlaceHolder</vendor>
 
     <depends>com.intellij.modules.platform</depends>
@@ -10,35 +10,35 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Correo" anchor="bottom" icon="/icons/pluginIcon.svg"
-                    factoryClass="com.correomqtt.intellij.ui.main.MainView"/>
+                    factoryClass="com.correomqtt.plugin.ui.main.MainView"/>
 
         <applicationService
-                serviceInterface="com.correomqtt.intellij.core.services.activation.ApplicationActivationService"
-                serviceImplementation="com.correomqtt.intellij.core.services.activation.ApplicationActivationServiceImpl"
+                serviceInterface="com.correomqtt.plugin.core.services.activation.ApplicationActivationService"
+                serviceImplementation="com.correomqtt.plugin.core.services.activation.ApplicationActivationServiceImpl"
                 id="ApplicationActivation"
         />
 
         <applicationService
-                serviceInterface="com.correomqtt.intellij.core.services.publish.PublishService"
-                serviceImplementation="com.correomqtt.intellij.core.services.publish.PublishServiceImpl"
+                serviceInterface="com.correomqtt.plugin.core.services.publish.PublishService"
+                serviceImplementation="com.correomqtt.plugin.core.services.publish.PublishServiceImpl"
                 id="PublishService"
         />
 
         <applicationService
-                serviceInterface="com.correomqtt.intellij.core.services.subscribe.SubscribeService"
-                serviceImplementation="com.correomqtt.intellij.core.services.subscribe.SubscribeServiceImpl"
+                serviceInterface="com.correomqtt.plugin.core.services.subscribe.SubscribeService"
+                serviceImplementation="com.correomqtt.plugin.core.services.subscribe.SubscribeServiceImpl"
                 id="SubscribeService"
         />
 
         <applicationService
-                serviceInterface="com.correomqtt.intellij.core.services.connection.ConnectionManagerService"
-                serviceImplementation="com.correomqtt.intellij.core.services.connection.ConnectionManagerServiceImpl"
+                serviceInterface="com.correomqtt.plugin.core.services.connection.ConnectionManagerService"
+                serviceImplementation="com.correomqtt.plugin.core.services.connection.ConnectionManagerServiceImpl"
                 id="ConnectionManager"
         />
     </extensions>
 
     <applicationListeners>
-        <listener class="com.correomqtt.intellij.core.listeners.ApplicationActivationListener"
+        <listener class="com.correomqtt.plugin.core.listeners.ApplicationActivationListener"
                   topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 </idea-plugin>
