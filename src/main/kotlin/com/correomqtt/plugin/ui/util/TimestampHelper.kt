@@ -1,5 +1,6 @@
 package com.correomqtt.plugin.ui.util
 
+import org.apache.http.client.utils.DateUtils.formatDate
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -7,21 +8,29 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 class TimestampHelper {
-    public fun format(timestamp: String): String {
-        // Trim the timestamp to keep only three milliseconds
-        val trimmedTimestamp = timestamp.substring(0, 23) // yyyy-MM-ddTHH:mm:ss.SSS
+    companion object {
+        private const val INPUT_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        private const val US_FORMAT = "MM/dd/yyyy hh:mm:ss.SSS a"
+        private const val DE_FORMAT = "dd.MM.yyyy HH:mm:ss.SSS"
+        private val locale = Locale.getDefault()
 
-        // Parse the input timestamp
-        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
-        val localDateTime = LocalDateTime.parse(trimmedTimestamp, inputFormatter)
+        fun format(timestamp: String): String {
+            // Trim the timestamp to keep only three milliseconds
+            val trimmedTimestamp = timestamp.substring(0, 23) // yyyy-MM-ddTHH:mm:ss.SSS
 
-        // Convert to Date
-        val instant = localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant()
-        val date = Date.from(instant)
+            // Parse the input timestamp
+            val inputFormatter = DateTimeFormatter.ofPattern(INPUT_FORMAT)
+            val localDateTime = LocalDateTime.parse(trimmedTimestamp, inputFormatter)
 
-        // Format the date according to user's locale
-        val dateFormatter: DateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.getDefault())
+            // Convert to Date
+            val instant = localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant()
+            val date = Date.from(instant)
 
-        return dateFormatter.format(date)
+            return if (locale == Locale.US) {
+                formatDate(date, US_FORMAT)
+            } else {
+                formatDate(date, DE_FORMAT)
+            }
+        }
     }
 }

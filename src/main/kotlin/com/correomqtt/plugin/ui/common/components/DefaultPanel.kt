@@ -1,10 +1,10 @@
 package com.correomqtt.plugin.ui.common.components
 
 import com.intellij.ui.JBColor
+import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import javax.swing.JLabel
 import javax.swing.JPanel
 
 class DefaultPanel(msg: String): JPanel(GridBagLayout()) {
@@ -17,7 +17,7 @@ class DefaultPanel(msg: String): JPanel(GridBagLayout()) {
         constraints.weighty = 1.0
         constraints.insets = JBUI.insets(10)  // Adding some padding around the text
 
-        val defaultLabel = JLabel(msg)
+        val defaultLabel = JBLabel(msg)
         defaultLabel.foreground = JBColor.GRAY
 
         add(defaultLabel, constraints)

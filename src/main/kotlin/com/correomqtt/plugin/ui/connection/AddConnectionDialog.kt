@@ -19,7 +19,6 @@ import java.awt.GridBagLayout
 import java.util.*
 import javax.swing.JButton
 import javax.swing.JComponent
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
@@ -88,7 +87,7 @@ class AddConnectionDialog(project: Project) : DialogWrapper(project) {
         clientIdContainer.add(clientIdField, BorderLayout.CENTER)
 
         panel.add(
-            JLabel("Client ID"),
+            JBLabel("Client ID"),
             gb.nextLine().next().weightx(0.2).anchor(GridBagConstraints.WEST).insetBottom(16)
         )
         panel.add(clientIdContainer, gb.next().weightx(0.6).fillCellHorizontally().insetBottom(16))
