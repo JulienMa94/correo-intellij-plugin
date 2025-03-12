@@ -6,6 +6,11 @@ import org.correomqtt.core.CorreoCore
 import org.correomqtt.di.Inject
 import org.correomqtt.di.SingletonBean
 
+/**
+ * Core plugin object which is called during plugin initialization.
+ * - correoCore -> Correo Backend initialization
+ * - keyringManager -> Intellij keyring and password encryption.
+ */
 @SingletonBean
 class CorreoPlugin @Inject constructor(
     private var correoCore: CorreoCore,

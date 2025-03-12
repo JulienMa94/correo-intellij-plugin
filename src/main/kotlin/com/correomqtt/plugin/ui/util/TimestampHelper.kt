@@ -7,6 +7,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+/**
+ * Utility class for timestamp specific methods.
+ */
 class TimestampHelper {
     companion object {
         private const val INPUT_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS"
@@ -14,6 +17,10 @@ class TimestampHelper {
         private const val DE_FORMAT = "dd.MM.yyyy HH:mm:ss.SSS"
         private val locale = Locale.getDefault()
 
+        /**
+         * Formats timestamp strings from format yyyy-MM-dd'T'HH:mm:ss.SSS
+         * to a US or DE Format.
+         */
         fun format(timestamp: String): String {
             // Trim the timestamp to keep only three milliseconds
             val trimmedTimestamp = timestamp.substring(0, 23) // yyyy-MM-ddTHH:mm:ss.SSS

@@ -10,7 +10,10 @@ import org.correomqtt.core.utils.ConnectionManager
 import org.correomqtt.di.Inject
 import org.correomqtt.di.SingletonBean
 
-
+/**
+ * GuiCore collects all relevant Correo backend services
+ * and exposes them to the plugin components / services.
+ */
 @SingletonBean
 class GuiCore @Inject constructor(
     private var coreManager: CoreManager,
