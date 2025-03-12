@@ -1,11 +1,15 @@
 package com.correomqtt.plugin.ui.subscribe.message
 
-import com.correomqtt.plugin.ui.common.events.ON_CONNECTION_SELECTED_TOPIC
+import com.correomqtt.plugin.GuiCore
 import com.correomqtt.plugin.ui.common.events.ConnectionSelectionListener
+import com.correomqtt.plugin.ui.common.events.ON_CONNECTION_SELECTED_TOPIC
 import com.correomqtt.plugin.ui.common.events.ON_MESSAGE_SELECTED
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
+import org.correomqtt.core.fileprovider.PublishHistory
+import org.correomqtt.core.fileprovider.PublishMessageHistory
+import org.correomqtt.core.fileprovider.SubscriptionHistory
 import org.correomqtt.core.pubsub.IncomingMessageEvent
 import org.correomqtt.di.Assisted
 import org.correomqtt.di.DefaultBean
@@ -17,19 +21,11 @@ import javax.swing.*
 
 //TODO: Add message listener click to select message and display in message detail view
 @DefaultBean
-class MessageListView constructor (@Assisted project: Project) : JPanel(BorderLayout()) {
+class MessageListView constructor(@Assisted project: Project) : JPanel(BorderLayout()) {
     private val listModel = DefaultListModel<IncomingMessageEvent>()
     private val jbList = JBList(listModel)
 
     init {
-        val connection = project.messageBus.connect();
-
-        connection.subscribe(ON_CONNECTION_SELECTED_TOPIC, object : ConnectionSelectionListener {
-            override fun onConnectionSelected(name: String, id: String) {
-                println("Connection selected received in message list view: $name, $id")
-            }
-        })
-
         jbList.selectionMode = ListSelectionModel.SINGLE_SELECTION
 
         jbList.cellRenderer = ListCellRenderer<IncomingMessageEvent> { _, value, _, isSelected, _ ->
